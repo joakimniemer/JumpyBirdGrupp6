@@ -8,18 +8,25 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
+
+import java.util.Iterator;
 
 public class JumpyBirb extends ApplicationAdapter {
 
     private Texture birdImage;
-    private Texture obstacles;
-    private Sound jumpSound;
+    private Texture obstacleImages;
+    private Sound crashSound;
     private Music backgroundMusic;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private Rectangle bird;
+    private Array<Rectangle> obstacles;
+    private long lastObstacleTime;
 
 
     @Override
@@ -28,10 +35,10 @@ public class JumpyBirb extends ApplicationAdapter {
         // Laddar in bilder mm varje gång spelet startas.
         // Hämtar dessa filer från asset där vi anävnder files.internal
         birdImage = new Texture(Gdx.files.internal("bucket.png"));
-        obstacles = new Texture(Gdx.files.internal("droplet.png"));
+        obstacleImages = new Texture(Gdx.files.internal("droplet.png"));
 
         // Ladda in musik/ljud
-        jumpSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
 
         // Startar bakgrunddmusiken direkt när spelet startas.
@@ -50,6 +57,8 @@ public class JumpyBirb extends ApplicationAdapter {
         bird.width = 64;
         bird.height = 64;
 
+        obstacles = new Array<Rectangle>();
+        spawnObstacle();
 
     }
 
@@ -65,10 +74,14 @@ public class JumpyBirb extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.draw(birdImage, bird.x, bird.y);
+        for(Rectangle obstacle: obstacles) {
+            batch.draw(obstacleImages, obstacle.x, obstacle.y);
+        }
         batch.end();
 
-		// Styr bird med tangenterna
-		if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) bird.y += 200 * Gdx.graphics.getDeltaTime();
+		// Hoppa med space
+		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) bird.y += 1500 * Gdx.graphics.getDeltaTime();
+
 
         //Får bird att falla neråt hela tiden
         bird.y -= 50 * Gdx.graphics.getDeltaTime();
@@ -78,6 +91,41 @@ public class JumpyBirb extends ApplicationAdapter {
         if(bird.y < 0) bird.y = 0;
         if(bird.y > 480 - 64) bird.y = 480 - 64;
 
+        // Räknar tid mellan hindren
+        if(TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
+
+
+        // Hur funkar denna???
+        for (Iterator<Rectangle> iter = obstacles.iterator(); iter.hasNext(); ) {
+            Rectangle obstacle = iter.next();
+            obstacle.x -= 200 * Gdx.graphics.getDeltaTime();
+            if(obstacle.overlaps(bird)) {
+                crashSound.play();
+                iter.remove();
+            }
+            if(obstacle.x + 64 < 0) iter.remove();
+        }
+
+
+
+
+
+    }
+
+    private void spawnObstacle(){
+        Rectangle obstacle1 = new Rectangle();
+        Rectangle obstacle2 = new Rectangle();
+        obstacle1.x = 800;
+        obstacle1.y = MathUtils.random(300, 400);
+        obstacle1.width = 64;
+        obstacle1.height = 64;
+        obstacle2.x = 800;
+        obstacle2.y = obstacle1.y - 200;
+        obstacle2.width = 64;
+        obstacle2.height = 64;
+        obstacles.add(obstacle1);
+        obstacles.add((obstacle2));
+        lastObstacleTime = TimeUtils.nanoTime();
     }
 
 //	@Override
