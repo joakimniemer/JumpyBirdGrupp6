@@ -1,6 +1,7 @@
 package se.yrgo;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
@@ -101,15 +102,10 @@ public class JumpyBirb extends ApplicationAdapter {
             obstacle.x -= 200 * Gdx.graphics.getDeltaTime();
             if(obstacle.overlaps(bird)) {
                 crashSound.play();
-                iter.remove();
                 gameEnds();
             }
             if(obstacle.x + 64 < 0) iter.remove();
         }
-
-
-
-
 
     }
 
@@ -118,6 +114,12 @@ public class JumpyBirb extends ApplicationAdapter {
         Gdx.graphics.setContinuousRendering(false);
         Gdx.graphics.requestRendering();
         backgroundMusic.stop();
+        gameOverMenu();
+
+    }
+
+    private void gameOverMenu() {
+        //Kod för att öppna meny
     }
 
     public void exitGame(){
