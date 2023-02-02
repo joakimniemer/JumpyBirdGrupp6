@@ -102,6 +102,7 @@ public class JumpyBirb extends ApplicationAdapter {
             if(obstacle.overlaps(bird)) {
                 crashSound.play();
                 iter.remove();
+                gameEnds();
             }
             if(obstacle.x + 64 < 0) iter.remove();
         }
@@ -110,6 +111,17 @@ public class JumpyBirb extends ApplicationAdapter {
 
 
 
+    }
+
+
+    private void gameEnds() {
+        Gdx.graphics.setContinuousRendering(false);
+        Gdx.graphics.requestRendering();
+        backgroundMusic.stop();
+    }
+
+    public void exitGame(){
+        Gdx.app.exit();
     }
 
     private void spawnObstacle(){
