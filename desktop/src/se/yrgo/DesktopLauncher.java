@@ -8,8 +8,10 @@ import se.yrgo.JumpyBirb;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setTitle("JumpBirb");
+		config.setWindowedMode(800, 480);
+		config.useVsync(true);
 		config.setForegroundFPS(60);
-		config.setTitle("JumpyBirb");
 		new Lwjgl3Application(new JumpyBirb(), config);
 	}
 }
