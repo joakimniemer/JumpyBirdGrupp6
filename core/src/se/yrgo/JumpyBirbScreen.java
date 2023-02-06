@@ -1,9 +1,8 @@
 package se.yrgo;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,7 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Iterator;
 
-public class JumpyBirb extends ApplicationAdapter {
+public class JumpyBirbScreen implements Screen {
 
     private Texture birdImage;
     private Texture obstacleImages;
@@ -29,9 +28,10 @@ public class JumpyBirb extends ApplicationAdapter {
     private Array<Rectangle> obstacles;
     private long lastObstacleTime;
 
+    final ScreenHandler game;
 
-    @Override
-    public void create() {
+    public JumpyBirbScreen(final ScreenHandler game) {
+        this.game = game;
 
         createImages();
         music();
@@ -57,6 +57,7 @@ public class JumpyBirb extends ApplicationAdapter {
 
     }
 
+
     private void music() {
         // Ladda in musik/ljud
         crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -68,12 +69,12 @@ public class JumpyBirb extends ApplicationAdapter {
         // Laddar in bilder mm varje gång spelet startas.
         // Hämtar dessa filer från asset där vi anävnder files.internal
         birdImage = new Texture(Gdx.files.internal("bucket.png"));
-        obstacleImages = new Texture(Gdx.files.internal("droplet.png"));
+        obstacleImages = new Texture(Gdx.files.internal("obstacle3.png"));
 
     }
 
     @Override
-    public void render() {
+    public void render(float delta) {
         // Sätter bakgrundfärg.
         ScreenUtils.clear(1, 1, 0, 1);
 
@@ -84,54 +85,52 @@ public class JumpyBirb extends ApplicationAdapter {
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
         batch.draw(birdImage, bird.x, bird.y);
-        for(Rectangle obstacle: obstacles) {
+        for (Rectangle obstacle : obstacles) {
             batch.draw(obstacleImages, obstacle.x, obstacle.y);
         }
         batch.end();
 
         birdMovment();
         obstaclePlacement();
-
-
     }
 
     private void obstaclePlacement() {
 
         // Räknar tid mellan hindren
-        if(TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
+        if (TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
 
 
         // Hur funkar denna???
         for (Iterator<Rectangle> iter = obstacles.iterator(); iter.hasNext(); ) {
             Rectangle obstacle = iter.next();
             obstacle.x -= 200 * Gdx.graphics.getDeltaTime();
-            if(obstacle.overlaps(bird)) {
+            if (obstacle.overlaps(bird)) {
                 crashSound.play();
                 gameEnds();
             }
-            if(obstacle.x + 64 < 0) iter.remove();
+            if (obstacle.x + 64 < 0) iter.remove();
         }
     }
 
     private void birdMovment() {
         // Hoppa med space
-        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) bird.y += 1500 * Gdx.graphics.getDeltaTime();
-
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            bird.y += 1500 * Gdx.graphics.getDeltaTime();
+        }
 
         //Får bird att falla neråt hela tiden
         bird.y -= 50 * Gdx.graphics.getDeltaTime();
 
         // Håller bird innanför spelrutan
         // Här bör man dö när man y = 0 eller 480
-        if(bird.y < 0) bird.y = 0;
-        if(bird.y > 480 - 64) bird.y = 480 - 64;
+        if (bird.y < 0) bird.y = 0;
+        if (bird.y > 480 - 64) bird.y = 480 - 64;
 
     }
 
-
     private void gameEnds() {
         Gdx.graphics.setContinuousRendering(false);
-        Gdx.graphics.requestRendering();
+//        Gdx.graphics.requestRendering(); Behövs inte?
         backgroundMusic.stop();
         gameOverMenu();
 
@@ -141,30 +140,63 @@ public class JumpyBirb extends ApplicationAdapter {
         //Kod för att öppna meny
     }
 
-    public void exitGame(){
+    public void exitGame() {
 
         Gdx.app.exit();
     }
 
-    private void spawnObstacle(){
+    private void spawnObstacle() {
         Rectangle obstacle1 = new Rectangle();
         Rectangle obstacle2 = new Rectangle();
         obstacle1.x = 800;
         obstacle1.y = MathUtils.random(300, 400);
-        obstacle1.width = 64;
-        obstacle1.height = 64;
+        obstacle1.width = 32;
+        obstacle1.height = 200;
         obstacle2.x = 800;
-        obstacle2.y = obstacle1.y - 200;
-        obstacle2.width = 64;
-        obstacle2.height = 64;
+        obstacle2.y = obstacle1.y - 400;
+        obstacle2.width = 32;
+        obstacle2.height = 200;
         obstacles.add(obstacle1);
         obstacles.add((obstacle2));
         lastObstacleTime = TimeUtils.nanoTime();
     }
 
-//	@Override
-//	public void dispose () {
-//		batch.dispose();
-//		img.dispose();
-//	}
+    @Override
+    public void show() {
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+
+    }
+
+//    @Override
+//    public void dispose() {
+//        batch.dispose();
+//        birdImage.dispose();
+//        obstacleImages.dispose();
+//        crashSound.dispose();
+//        backgroundMusic.dispose();
+//    }
 }
