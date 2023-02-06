@@ -142,6 +142,7 @@ public class JumpyBirb extends ApplicationAdapter {
     }
 
     public void exitGame(){
+
         Gdx.app.exit();
     }
 
