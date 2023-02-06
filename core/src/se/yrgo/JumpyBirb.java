@@ -32,15 +32,9 @@ public class JumpyBirb extends ApplicationAdapter {
 
     @Override
     public void create() {
-        // Create körs en gång varje gång spelet startas.
-        // Laddar in bilder mm varje gång spelet startas.
-        // Hämtar dessa filer från asset där vi anävnder files.internal
-        birdImage = new Texture(Gdx.files.internal("bucket.png"));
-        obstacleImages = new Texture(Gdx.files.internal("droplet.png"));
 
-        // Ladda in musik/ljud
-        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+        createImages();
+        music();
 
         // Startar bakgrunddmusiken direkt när spelet startas.
         backgroundMusic.setLooping(true);
@@ -63,6 +57,21 @@ public class JumpyBirb extends ApplicationAdapter {
 
     }
 
+    private void music() {
+        // Ladda in musik/ljud
+        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+    }
+
+    private void createImages() {
+        // Create körs en gång varje gång spelet startas.
+        // Laddar in bilder mm varje gång spelet startas.
+        // Hämtar dessa filer från asset där vi anävnder files.internal
+        birdImage = new Texture(Gdx.files.internal("bucket.png"));
+        obstacleImages = new Texture(Gdx.files.internal("droplet.png"));
+
+    }
+
     @Override
     public void render() {
         // Sätter bakgrundfärg.
@@ -80,17 +89,13 @@ public class JumpyBirb extends ApplicationAdapter {
         }
         batch.end();
 
-		// Hoppa med space
-		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) bird.y += 1500 * Gdx.graphics.getDeltaTime();
+        birdMovment();
+        obstaclePlacement();
 
 
-        //Får bird att falla neråt hela tiden
-        bird.y -= 50 * Gdx.graphics.getDeltaTime();
+    }
 
-        // Håller bird innanför spelrutan
-        // Här bör man dö när man y = 0 eller 480
-        if(bird.y < 0) bird.y = 0;
-        if(bird.y > 480 - 64) bird.y = 480 - 64;
+    private void obstaclePlacement() {
 
         // Räknar tid mellan hindren
         if(TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
@@ -106,6 +111,20 @@ public class JumpyBirb extends ApplicationAdapter {
             }
             if(obstacle.x + 64 < 0) iter.remove();
         }
+    }
+
+    private void birdMovment() {
+        // Hoppa med space
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) bird.y += 1500 * Gdx.graphics.getDeltaTime();
+
+
+        //Får bird att falla neråt hela tiden
+        bird.y -= 50 * Gdx.graphics.getDeltaTime();
+
+        // Håller bird innanför spelrutan
+        // Här bör man dö när man y = 0 eller 480
+        if(bird.y < 0) bird.y = 0;
+        if(bird.y > 480 - 64) bird.y = 480 - 64;
 
     }
 
