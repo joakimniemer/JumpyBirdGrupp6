@@ -34,11 +34,11 @@ public class JumpyBirbScreen implements Screen {
         this.game = game;
 
         createImages();
-        music();
 
+//        music();
         // Startar bakgrunddmusiken direkt när spelet startas.
-        backgroundMusic.setLooping(true);
-        backgroundMusic.play();
+//        backgroundMusic.setLooping(true);
+//        backgroundMusic.play();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 800, 480);
@@ -47,7 +47,7 @@ public class JumpyBirbScreen implements Screen {
 
         // Skapar fågeln, ger den en storlek och position i rutnätet.
         bird = new Rectangle();
-        bird.x = 800 / 2 - 64 / 2;
+        bird.x = 150;
         bird.y = 480 / 2 - 64 / 2;
         bird.width = 64;
         bird.height = 64;
@@ -57,21 +57,6 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-
-    private void music() {
-        // Ladda in musik/ljud
-        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-    }
-
-    private void createImages() {
-        // Create körs en gång varje gång spelet startas.
-        // Laddar in bilder mm varje gång spelet startas.
-        // Hämtar dessa filer från asset där vi anävnder files.internal
-        birdImage = new Texture(Gdx.files.internal("bucket.png"));
-        obstacleImages = new Texture(Gdx.files.internal("obstacle3.png"));
-
-    }
 
     @Override
     public void render(float delta) {
@@ -94,11 +79,26 @@ public class JumpyBirbScreen implements Screen {
         obstaclePlacement();
     }
 
+
+    //    private void music() {
+//        // Ladda in musik/ljud
+//        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
+//        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+//    }
+
+    private void createImages() {
+        // Create körs en gång varje gång spelet startas.
+        // Laddar in bilder mm varje gång spelet startas.
+        // Hämtar dessa filer från asset där vi anävnder files.internal
+        birdImage = new Texture(Gdx.files.internal("bucket.png"));
+        obstacleImages = new Texture(Gdx.files.internal("obstacle3.png"));
+
+    }
+
     private void obstaclePlacement() {
 
         // Räknar tid mellan hindren
         if (TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
-
 
         // Hur funkar denna???
         for (Iterator<Rectangle> iter = obstacles.iterator(); iter.hasNext(); ) {
