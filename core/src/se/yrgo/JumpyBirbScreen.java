@@ -73,7 +73,7 @@ public class JumpyBirbScreen implements Screen {
     private void checkForCollison() {
         int numContacts = world.getContactCount();
 
-        if (numContacts > 0){
+        if (numContacts > 0) {
             gameOverMenu();
         }
     }
