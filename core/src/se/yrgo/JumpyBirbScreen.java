@@ -74,7 +74,7 @@ public class JumpyBirbScreen implements Screen {
         int numContacts = world.getContactCount();
 
         if (numContacts > 0){
-            System.out.println("DÖD");
+            gameOverMenu();
         }
     }
 
@@ -184,7 +184,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void gameOverMenu() {
-        //Kod för att öppna meny
+        game.setScreen(new GameOverScreen(game));
     }
 
     @Override
