@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class JumpyBirbScreen implements Screen {
 
     private Texture rocket;
+    private Texture space;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
@@ -42,14 +43,18 @@ public class JumpyBirbScreen implements Screen {
         //Create boxed with Box2d
         world = new World(new Vector2(0, worldGravity), false);
         b2dr = new Box2DDebugRenderer();
-        // Boxes
+        // Box for player
         player = createBox(32, 16, false, 100, 300);
 
-        //Creating batch
-        batch = new SpriteBatch();
+
         // Load images
         rocket = new Texture("rocket.png");
+        space = new Texture("space.png");
 
+        //Creating SpriteBatch
+        batch = new SpriteBatch();
+
+        //Sätter tiden för senaste hinder första gången
         lastObstacleTime = TimeUtils.nanoTime();
 
     }
@@ -62,17 +67,16 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
         batch.begin();
+        batch.draw(space, 0, 0, 700 / SCALE, 800 / SCALE);
         batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         batch.end();
 
         // Behövs bara för debugging.
         b2dr.render(world, camera.combined);
-
     }
 
     private void checkForCollison() {
         int numContacts = world.getContactCount();
-
         if (numContacts > 0) {
             gameOverMenu();
         }
@@ -112,15 +116,15 @@ public class JumpyBirbScreen implements Screen {
     }
 
     // Skapa hinder (kinimatiska boxar)
-    private Body createKinimaticBody(int width, int heigth, int x, int y) {
+    private Body createKinimaticBody(int radius, int x, int y) {
         Body pBody;
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.KinematicBody;
         def.position.set(x, y);
         def.fixedRotation = true;
         pBody = world.createBody(def);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / SCALE, heigth / SCALE);
+        CircleShape shape = new CircleShape();
+        shape.setRadius(radius / SCALE);
 
         pBody.createFixture(shape, 1.0f);
         shape.dispose();
@@ -131,17 +135,17 @@ public class JumpyBirbScreen implements Screen {
 
     //Spawna nya hinder
     private void spawnObstacle() {
-        int randomPositionY = MathUtils.random(-150, 50);
-        Body lowerObstacle = createKinimaticBody(32, 400, 367, randomPositionY);
+        int randomPositionY = MathUtils.random(0, 100);
+        Body lowerObstacle = createKinimaticBody(32, 367, randomPositionY);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
-        Body upperObstacle = createKinimaticBody(32, 400, 367, randomPositionY + 500); //450 +-25??
+        Body upperObstacle = createKinimaticBody(32, 367, randomPositionY + 200);
         upperObstacle.setLinearVelocity(speedObstacle, 0);
         lastObstacleTime = TimeUtils.nanoTime();
     }
 
     // Räknar tid mellan hindren
     private void continuouslySpawningObstacles() {
-        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > 1) {
+        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > 0.2) {
             spawnObstacle();
             //TODO: Måste lösa så att hindren tas bort när dom är utanför banan.
         }
