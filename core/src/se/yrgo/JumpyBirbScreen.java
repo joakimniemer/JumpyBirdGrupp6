@@ -65,12 +65,17 @@ public class JumpyBirbScreen implements Screen {
         batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         batch.end();
 
+        // Behövs bara för debugging.
         b2dr.render(world, camera.combined);
 
-        continuouslySpawningObstacles();
+    }
 
-        //TODO: if (rocket contact obstacle).....
-        // Implementera ContactListener?
+    private void checkForCollison() {
+        int numContacts = world.getContactCount();
+
+        if (numContacts > 0){
+            System.out.println("DÖD");
+        }
     }
 
 
@@ -78,10 +83,12 @@ public class JumpyBirbScreen implements Screen {
     public void update(float delta) {
         world.step(1 / 60f, 6, 2);
 
-        jumpWithSpace(delta);
-
+        jumpWithSpaceAndMouseClick(delta);
+        continuouslySpawningObstacles();
+        checkForCollison();
         batch.setProjectionMatrix(camera.combined);
     }
+
 
     // Skapa en box, static och dynamisk
     private Body createBox(int width, int heigth, boolean isStatic, int x, int y) {
@@ -141,7 +148,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     // Hoppa med space
-    private void jumpWithSpace(float delta) {
+    private void jumpWithSpaceAndMouseClick(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             player.applyForceToCenter(0, 100000000, false);
         }
