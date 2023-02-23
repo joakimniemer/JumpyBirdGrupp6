@@ -24,7 +24,7 @@ public class JumpyBirbScreen implements Screen {
     // Skalar grafiken
     // TODO: Tror detta behövs för att kunna skala allt som Hampus snacka om. Behöver appliceras på all grafik.
     private final float SCALE = 2.0f;
-    private final float worldGravity = -250f;
+    private final float worldGravity = -300f;
     private final int speedObstacle = -125;
     private long lastObstacleTime;
 
@@ -73,7 +73,7 @@ public class JumpyBirbScreen implements Screen {
     private void checkForCollison() {
         int numContacts = world.getContactCount();
 
-        if (numContacts > 0){
+        if (numContacts > 0) {
             System.out.println("DÖD");
         }
     }
@@ -149,10 +149,10 @@ public class JumpyBirbScreen implements Screen {
 
     // Hoppa med space
     private void jumpWithSpaceAndMouseClick(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
         }
-        //TODO: Lägga till så man hoppar med musknappen också.
+        //TODO: Lägga till så man hoppar med musknappen också. Kolla på detta funkar eller om det behövs en InputProcessor/InputAdapter
     }
 
     @Override
