@@ -3,172 +3,162 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
-import java.util.Iterator;
-
 public class JumpyBirbScreen implements Screen {
 
-    private Texture birdImage;
-    private Texture obstacleImages;
-    private Sound crashSound;
-    private Music backgroundMusic;
+    private Texture rocket;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private Rectangle bird;
-    private Array<Rectangle> obstacles;
+    private World world;
+    private Body player;
+    private Box2DDebugRenderer b2dr;
+
+    // Skalar grafiken
+    // TODO: Tror detta behövs för att kunna skala allt som Hampus snacka om. Behöver appliceras på all grafik.
+    private final float SCALE = 2.0f;
+    private final float worldGravity = -250f;
+    private final int speedObstacle = -125;
     private long lastObstacleTime;
 
-    final ScreenHandler game;
+    private final ScreenHandler game;
 
     public JumpyBirbScreen(final ScreenHandler game) {
         this.game = game;
 
-        createImages();
+        float w = Gdx.graphics.getWidth();
+        float h = Gdx.graphics.getWidth();
 
-//        music();
-        // Startar bakgrunddmusiken direkt när spelet startas.
-//        backgroundMusic.setLooping(true);
-//        backgroundMusic.play();
-
+        // camera
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
+        camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
+        //Create boxed with Box2d
+        world = new World(new Vector2(0, worldGravity), false);
+        b2dr = new Box2DDebugRenderer();
+        // Boxes
+        player = createBox(32, 16, false, 100, 300);
 
+        //Creating batch
         batch = new SpriteBatch();
+        // Load images
+        rocket = new Texture("rocket.png");
 
-        // Skapar fågeln, ger den en storlek och position i rutnätet.
-        bird = new Rectangle();
-        bird.x = 150;
-        bird.y = 480 / 2 - 64 / 2;
-        bird.width = 64;
-        bird.height = 64;
-
-        obstacles = new Array<Rectangle>();
-        spawnObstacle();
+        lastObstacleTime = TimeUtils.nanoTime();
 
     }
 
 
     @Override
     public void render(float delta) {
-        // Sätter bakgrundfärg.
-        ScreenUtils.clear(1, 1, 0, 1);
+        ScreenUtils.clear(0, 0, 0.2f, 1);
 
-        // Säger till kameran att säkerställa att den uppdateras. En gång per frame?
-        camera.update();
+        update(Gdx.graphics.getDeltaTime());
 
-        // camera skapar rutnätet (800x480), och SpriteBatch är det som "målar" ut objekten
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(birdImage, bird.x, bird.y);
-        for (Rectangle obstacle : obstacles) {
-            batch.draw(obstacleImages, obstacle.x, obstacle.y);
-        }
+        batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         batch.end();
 
-        birdMovment();
-        obstaclePlacement();
+        b2dr.render(world, camera.combined);
+
+        continuouslySpawningObstacles();
+
+        //TODO: if (rocket contact obstacle).....
+        // Implementera ContactListener?
     }
 
 
-    //    private void music() {
-//        // Ladda in musik/ljud
-//        crashSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-//        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-//    }
+    // Uppdatera box2D i render
+    public void update(float delta) {
+        world.step(1 / 60f, 6, 2);
 
-    private void createImages() {
-        // Create körs en gång varje gång spelet startas.
-        // Laddar in bilder mm varje gång spelet startas.
-        // Hämtar dessa filer från asset där vi anävnder files.internal
-        birdImage = new Texture(Gdx.files.internal("bucket.png"));
-        obstacleImages = new Texture(Gdx.files.internal("obstacle3.png"));
+        jumpWithSpace(delta);
 
+        batch.setProjectionMatrix(camera.combined);
     }
 
-    private void obstaclePlacement() {
-
-        // Räknar tid mellan hindren
-        if (TimeUtils.nanoTime() - lastObstacleTime > 1000000000) spawnObstacle();
-
-        // Hur funkar denna???
-        for (Iterator<Rectangle> iter = obstacles.iterator(); iter.hasNext(); ) {
-            Rectangle obstacle = iter.next();
-            obstacle.x -= 200 * Gdx.graphics.getDeltaTime();
-            if (obstacle.overlaps(bird)) {
-                crashSound.play();
-                gameEnds();
-            }
-            if (obstacle.x + 64 < 0) iter.remove();
+    // Skapa en box, static och dynamisk
+    private Body createBox(int width, int heigth, boolean isStatic, int x, int y) {
+        Body pBody;
+        BodyDef def = new BodyDef();
+        if (isStatic) {
+            def.type = BodyDef.BodyType.StaticBody;
+        } else {
+            def.type = BodyDef.BodyType.DynamicBody;
         }
+        def.position.set(x, y);
+        def.fixedRotation = true;
+        pBody = world.createBody(def);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / SCALE, heigth / SCALE);
+
+        pBody.createFixture(shape, 1.0f);
+        shape.dispose();
+
+        return pBody;
     }
 
-    private void birdMovment() {
-        // Hoppa med space
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            bird.y += 1500 * Gdx.graphics.getDeltaTime();
-        }
+    // Skapa hinder (kinimatiska boxar)
+    private Body createKinimaticBody(int width, int heigth, int x, int y) {
+        Body pBody;
+        BodyDef def = new BodyDef();
+        def.type = BodyDef.BodyType.KinematicBody;
+        def.position.set(x, y);
+        def.fixedRotation = true;
+        pBody = world.createBody(def);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / SCALE, heigth / SCALE);
 
-        //Får bird att falla neråt hela tiden
-        bird.y -= 50 * Gdx.graphics.getDeltaTime();
+        pBody.createFixture(shape, 1.0f);
+        shape.dispose();
 
-        // Håller bird innanför spelrutan
-        // Här bör man dö när man y = 0 eller 480
-        if (bird.y < 0) bird.y = 0;
-        if (bird.y > 480 - 64) bird.y = 480 - 64;
-
+        return pBody;
     }
 
-    private void gameEnds() {
-        Gdx.graphics.setContinuousRendering(false);
-//        Gdx.graphics.requestRendering(); Behövs inte?
-        backgroundMusic.stop();
-        gameOverMenu();
 
-    }
-
-    private void gameOverMenu() {
-        //Kod för att öppna meny
-    }
-
-    public void exitGame() {
-
-        Gdx.app.exit();
-    }
-
+    //Spawna nya hinder
     private void spawnObstacle() {
-        Rectangle obstacle1 = new Rectangle();
-        Rectangle obstacle2 = new Rectangle();
-        obstacle1.x = 800;
-        obstacle1.y = MathUtils.random(300, 400);
-        obstacle1.width = 32;
-        obstacle1.height = 200;
-        obstacle2.x = 800;
-        obstacle2.y = obstacle1.y - 400;
-        obstacle2.width = 32;
-        obstacle2.height = 200;
-        obstacles.add(obstacle1);
-        obstacles.add((obstacle2));
+        int randomPositionY = MathUtils.random(-150, 50);
+        Body lowerObstacle = createKinimaticBody(32, 400, 367, randomPositionY);
+        lowerObstacle.setLinearVelocity(speedObstacle, 0);
+        Body upperObstacle = createKinimaticBody(32, 400, 367, randomPositionY + 500); //450 +-25??
+        upperObstacle.setLinearVelocity(speedObstacle, 0);
         lastObstacleTime = TimeUtils.nanoTime();
     }
 
-    @Override
-    public void show() {
+    // Räknar tid mellan hindren
+    private void continuouslySpawningObstacles() {
+        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > 1) {
+            spawnObstacle();
+            //TODO: Måste lösa så att hindren tas bort när dom är utanför banan.
+        }
+    }
 
+    // Hoppa med space
+    private void jumpWithSpace(float delta) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            player.applyForceToCenter(0, 100000000, false);
+        }
+        //TODO: Lägga till så man hoppar med musknappen också.
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void dispose() {
+        world.dispose();
+        b2dr.dispose();
+        batch.dispose();
+    }
 
+    // Gör ingenting ännu?
+    @Override
+    public void resize(int width, int height) {
+        camera.setToOrtho(false, width / SCALE, height / SCALE);
     }
 
     @Override
@@ -186,17 +176,20 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
+    private void gameOverMenu() {
+        //Kod för att öppna meny
+    }
+
     @Override
-    public void dispose() {
+    public void show() {
 
     }
 
-//    @Override
-//    public void dispose() {
-//        batch.dispose();
-//        birdImage.dispose();
-//        obstacleImages.dispose();
-//        crashSound.dispose();
-//        backgroundMusic.dispose();
-//    }
+    public void exitGame() {
+        Gdx.app.exit();
+    }
+
+
 }
+
+
