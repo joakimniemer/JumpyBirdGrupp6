@@ -9,17 +9,23 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import java.util.Iterator;
+
 
 public class JumpyBirbScreen implements Screen {
 
     private Texture rocket;
     private Texture space;
+    private Texture astroid;
     private OrthographicCamera camera;
     private SpriteBatch batch;
     private World world;
     private Body player;
+    private Array<Body> obstacles;
     private Box2DDebugRenderer b2dr;
 
     // Skalar grafiken
@@ -50,12 +56,16 @@ public class JumpyBirbScreen implements Screen {
         // Load images
         rocket = new Texture("rocket.png");
         space = new Texture("space.png");
+        astroid = new Texture("astroid.png");
 
         //Creating SpriteBatch
         batch = new SpriteBatch();
 
         //Sätter tiden för senaste hinder första gången
         lastObstacleTime = TimeUtils.nanoTime();
+
+        //Skapar Array för obstacles
+        obstacles = new Array<Body>();
 
     }
 
@@ -66,14 +76,19 @@ public class JumpyBirbScreen implements Screen {
 
         update(Gdx.graphics.getDeltaTime());
 
+        //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
         batch.draw(space, 0, 0, 700 / SCALE, 800 / SCALE);
         batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        for (Body obstacle : obstacles) {
+            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
+        }
         batch.end();
 
         // Behövs bara för debugging.
         b2dr.render(world, camera.combined);
     }
+
 
     private void checkForCollison() {
         int numContacts = world.getContactCount();
@@ -86,10 +101,10 @@ public class JumpyBirbScreen implements Screen {
     // Uppdatera box2D i render
     public void update(float delta) {
         world.step(1 / 60f, 6, 2);
-
         jumpWithSpaceAndMouseClick(delta);
         continuouslySpawningObstacles();
         checkForCollison();
+        disposeObstacles();
         batch.setProjectionMatrix(camera.combined);
     }
 
@@ -135,11 +150,18 @@ public class JumpyBirbScreen implements Screen {
 
     //Spawna nya hinder
     private void spawnObstacle() {
-        int randomPositionY = MathUtils.random(0, 100);
-        Body lowerObstacle = createKinimaticBody(32, 367, randomPositionY);
+        int randomPositionY1 = MathUtils.random(50, 150);
+        int randomPositionY2 = MathUtils.random(150, 300);
+        int randomPositionY3 = MathUtils.random(300, 450);
+        Body lowerObstacle = createKinimaticBody(32, 367, randomPositionY1);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
-        Body upperObstacle = createKinimaticBody(32, 367, randomPositionY + 200);
+        Body middleObstacle = createKinimaticBody(32, 367, randomPositionY2);
+        middleObstacle.setLinearVelocity(speedObstacle, 0);
+        Body upperObstacle = createKinimaticBody(32, 367, randomPositionY3);
         upperObstacle.setLinearVelocity(speedObstacle, 0);
+        obstacles.add(lowerObstacle);
+        obstacles.add(middleObstacle);
+        obstacles.add(upperObstacle);
         lastObstacleTime = TimeUtils.nanoTime();
     }
 
@@ -157,6 +179,16 @@ public class JumpyBirbScreen implements Screen {
             player.applyForceToCenter(0, 100000000, false);
         }
         //TODO: Lägga till så man hoppar med musknappen också. Kolla på detta funkar eller om det behövs en InputProcessor/InputAdapter
+    }
+
+    // Tar bort hindren när dom kommer till x = 0;
+    private void disposeObstacles() {
+        for (Iterator<Body> iter = obstacles.iterator(); iter.hasNext(); ) {
+            Body obs = iter.next();
+            if (obs.getPosition().x < 0) {
+                iter.remove();
+            }
+        }
     }
 
     @Override
