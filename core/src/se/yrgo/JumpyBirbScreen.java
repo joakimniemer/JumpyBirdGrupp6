@@ -26,7 +26,7 @@ public class JumpyBirbScreen implements Screen {
     private World world;
     private Body player;
     private Array<Body> obstacles;
-    private Box2DDebugRenderer b2dr;
+    private Box2DDebugRenderer boxDebugger;
 
     // Skalar grafiken
     // TODO: Tror detta behövs för att kunna skala allt som Hampus snacka om. Behöver appliceras på all grafik.
@@ -40,23 +40,16 @@ public class JumpyBirbScreen implements Screen {
     public JumpyBirbScreen(final ScreenHandler game) {
         this.game = game;
 
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getWidth();
-
         // camera
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
         //Create boxed with Box2d
         world = new World(new Vector2(0, worldGravity), false);
-        b2dr = new Box2DDebugRenderer();
+        boxDebugger = new Box2DDebugRenderer();
         // Box for player
-        player = createBox(32, 16, false, 100, 300);
+        player = LoadAssets.createBox(world, SCALE,32, 16, false, 100, 300);
 
-
-        // Load images
-        rocket = new Texture("rocket.png");
-        space = new Texture("space.png");
-        astroid = new Texture("astroid.png");
+       loadImages();
 
         //Creating SpriteBatch
         batch = new SpriteBatch();
@@ -67,6 +60,12 @@ public class JumpyBirbScreen implements Screen {
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
 
+    }
+
+    private void loadImages() {
+        rocket = new Texture("rocket.png");
+        space = new Texture("space.png");
+        astroid = new Texture("astroid.png");
     }
 
 
@@ -86,17 +85,16 @@ public class JumpyBirbScreen implements Screen {
         batch.end();
 
         // Behövs bara för debugging.
-        b2dr.render(world, camera.combined);
+        boxDebugger.render(world, camera.combined);
     }
 
 
     private void checkForCollison() {
-        int numContacts = world.getContactCount();
-        if (numContacts > 0) {
+        int numberContacts = world.getContactCount();
+        if (numberContacts > 0) {
             gameOverMenu();
         }
     }
-
 
     // Uppdatera box2D i render
     public void update(float delta) {
@@ -108,56 +106,16 @@ public class JumpyBirbScreen implements Screen {
         batch.setProjectionMatrix(camera.combined);
     }
 
-
-    // Skapa en box, static och dynamisk
-    private Body createBox(int width, int heigth, boolean isStatic, int x, int y) {
-        Body pBody;
-        BodyDef def = new BodyDef();
-        if (isStatic) {
-            def.type = BodyDef.BodyType.StaticBody;
-        } else {
-            def.type = BodyDef.BodyType.DynamicBody;
-        }
-        def.position.set(x, y);
-        def.fixedRotation = true;
-        pBody = world.createBody(def);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / SCALE, heigth / SCALE);
-
-        pBody.createFixture(shape, 1.0f);
-        shape.dispose();
-
-        return pBody;
-    }
-
-    // Skapa hinder (kinimatiska boxar)
-    private Body createKinimaticBody(int radius, int x, int y) {
-        Body pBody;
-        BodyDef def = new BodyDef();
-        def.type = BodyDef.BodyType.KinematicBody;
-        def.position.set(x, y);
-        def.fixedRotation = true;
-        pBody = world.createBody(def);
-        CircleShape shape = new CircleShape();
-        shape.setRadius(radius / SCALE);
-
-        pBody.createFixture(shape, 1.0f);
-        shape.dispose();
-
-        return pBody;
-    }
-
-
     //Spawna nya hinder
     private void spawnObstacle() {
         int randomPositionY1 = MathUtils.random(50, 150);
         int randomPositionY2 = MathUtils.random(150, 300);
         int randomPositionY3 = MathUtils.random(300, 450);
-        Body lowerObstacle = createKinimaticBody(32, 367, randomPositionY1);
+        Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, 367, randomPositionY1);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
-        Body middleObstacle = createKinimaticBody(32, 367, randomPositionY2);
+        Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, 367, randomPositionY2);
         middleObstacle.setLinearVelocity(speedObstacle, 0);
-        Body upperObstacle = createKinimaticBody(32, 367, randomPositionY3);
+        Body upperObstacle = LoadAssets.createKinimaticBody(world, SCALE,32, 367, randomPositionY3);
         upperObstacle.setLinearVelocity(speedObstacle, 0);
         obstacles.add(lowerObstacle);
         obstacles.add(middleObstacle);
@@ -178,7 +136,6 @@ public class JumpyBirbScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
         }
-        //TODO: Lägga till så man hoppar med musknappen också. Kolla på detta funkar eller om det behövs en InputProcessor/InputAdapter
     }
 
     // Tar bort hindren när dom kommer till x = 0;
@@ -194,7 +151,7 @@ public class JumpyBirbScreen implements Screen {
     @Override
     public void dispose() {
         world.dispose();
-        b2dr.dispose();
+        boxDebugger.dispose();
         batch.dispose();
     }
 
