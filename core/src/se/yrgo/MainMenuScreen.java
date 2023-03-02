@@ -9,13 +9,10 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class MainMenuScreen implements Screen {
-
     Texture playButtonImg;
     private Body playBox;
     final ScreenHandler game;
     OrthographicCamera camera;
-
-
 
     public MainMenuScreen(final ScreenHandler game) {
         this.game = game;
@@ -28,9 +25,6 @@ public class MainMenuScreen implements Screen {
         playButtonImg = new Texture("play.png");
     }
 
-
-
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
@@ -39,51 +33,39 @@ public class MainMenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! ", 100, 150);
-        game.batch.draw(playButtonImg, 100, 100, 300, 150);
+        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! ", 250, 700);
+        game.batch.draw(playButtonImg, 175, 500, 300, 150);
+        game.batch.draw(playButtonImg, 175, 300, 300, 150);
+        game.batch.draw(playButtonImg, 175, 100, 300, 150);
         game.batch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             game.setScreen((new JumpyBirbScreen(game)));
             dispose();
         }
-
-
-
-
     }
-
     private void PlayButton() {
-
     }
-
-
     public void show() {
-
     }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void hide() {
-
     }
 
     @Override
     public void dispose() {
-
     }
 }
