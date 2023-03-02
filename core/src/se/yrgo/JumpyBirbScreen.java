@@ -155,10 +155,13 @@ public class JumpyBirbScreen implements Screen {
         batch.dispose();
     }
 
-    // Gör ingenting ännu?
+
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false, width / SCALE, height / SCALE);
+        //TODO: fixa resizen
+        camera.setToOrtho(false, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
+//        camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
+
     }
 
     @Override
