@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameOverScreen implements Screen {
@@ -15,6 +17,7 @@ public class GameOverScreen implements Screen {
 
     public GameOverScreen(final ScreenHandler game) {
         this.game = game;
+//        this.tr = tr;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
@@ -27,7 +30,7 @@ public class GameOverScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+//        ScreenUtils.clear(0, 0, 0.2f, 1);
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
@@ -37,7 +40,7 @@ public class GameOverScreen implements Screen {
         game.font.draw(game.batch, "Tap anywhere to restart!", 100, 100);
         game.batch.end();
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT))  {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
             game.setScreen(new JumpyBirbScreen(game));
             dispose();
         }
@@ -67,6 +70,7 @@ public class GameOverScreen implements Screen {
     public void dispose() {
 
     }
+
     public void exitGame() {
         Gdx.app.exit();
     }

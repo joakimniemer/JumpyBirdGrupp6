@@ -3,9 +3,13 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -62,10 +66,12 @@ public class JumpyBirbScreen implements Screen {
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
 
+
     }
 
     @Override
     public void render(float delta) {
+        Gdx.graphics.setContinuousRendering(true);
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
         update(Gdx.graphics.getDeltaTime());
@@ -87,6 +93,8 @@ public class JumpyBirbScreen implements Screen {
     private void checkForCollison() {
         int numberContacts = world.getContactCount();
         if (numberContacts > 0) {
+            Gdx.graphics.setContinuousRendering(false);
+            Gdx.graphics.requestRendering();
             gameOverMenu();
         }
     }
