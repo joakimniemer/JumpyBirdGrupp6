@@ -29,7 +29,7 @@ public class JumpyBirbScreen implements Screen {
     private Box2DDebugRenderer boxDebugger;
 
     // Skalar grafiken
-    // TODO: Tror detta behövs för att kunna skala allt som Hampus snacka om. Behöver appliceras på all grafik.
+    // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
     private final float SCALE = 2.0f;
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
@@ -40,16 +40,18 @@ public class JumpyBirbScreen implements Screen {
     public JumpyBirbScreen(final ScreenHandler game) {
         this.game = game;
 
-        // camera
+        // camera TODO: SCALE på camera ger ingen funktion??
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
+
         //Create boxed with Box2d
         world = new World(new Vector2(0, worldGravity), false);
         boxDebugger = new Box2DDebugRenderer();
-        // Box for player
-        player = LoadAssets.createBox(world, SCALE,32, 16, false, 100, 300);
 
-       loadImages();
+        // Box for player
+        player = LoadAssets.createBox(world, SCALE, 32, 16, false, 100, 300);
+
+        loadImages();
 
         //Creating SpriteBatch
         batch = new SpriteBatch();
@@ -62,13 +64,6 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-    private void loadImages() {
-        rocket = new Texture("rocket.png");
-        space = new Texture("space.png");
-        astroid = new Texture("astroid.png");
-    }
-
-
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 0.2f, 1);
@@ -77,7 +72,7 @@ public class JumpyBirbScreen implements Screen {
 
         //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
-        batch.draw(space, 0, 0, 700 / SCALE, 800 / SCALE);
+        batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
         batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
@@ -108,19 +103,23 @@ public class JumpyBirbScreen implements Screen {
 
     //Spawna nya hinder
     private void spawnObstacle() {
-        int randomPositionY1 = MathUtils.random(50, 150);
-        int randomPositionY2 = MathUtils.random(150, 300);
-        int randomPositionY3 = MathUtils.random(300, 450);
-        Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, 367, randomPositionY1);
+        int randomPositionY1 = MathUtils.random(21, 119);
+        int randomPositionY2 = MathUtils.random(161, 259);
+        int randomPositionY3 = MathUtils.random(280, 379);
+        int randomPositionX1 = MathUtils.random(367, 460);
+        int randomPositionX2 = MathUtils.random(367, 460);
+        int randomPositionX3 = MathUtils.random(367, 460);
+        Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX1, randomPositionY1);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
-        Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, 367, randomPositionY2);
+        Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX2, randomPositionY2);
         middleObstacle.setLinearVelocity(speedObstacle, 0);
-        Body upperObstacle = LoadAssets.createKinimaticBody(world, SCALE,32, 367, randomPositionY3);
+        Body upperObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX3, randomPositionY3);
         upperObstacle.setLinearVelocity(speedObstacle, 0);
         obstacles.add(lowerObstacle);
         obstacles.add(middleObstacle);
         obstacles.add(upperObstacle);
         lastObstacleTime = TimeUtils.nanoTime();
+
     }
 
     // Räknar tid mellan hindren
@@ -146,6 +145,12 @@ public class JumpyBirbScreen implements Screen {
                 iter.remove();
             }
         }
+    }
+
+    private void loadImages() {
+        rocket = new Texture("rocket.png");
+        space = new Texture("space.png");
+        astroid = new Texture("astroid.png");
     }
 
     @Override
