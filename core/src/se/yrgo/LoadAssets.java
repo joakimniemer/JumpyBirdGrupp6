@@ -1,7 +1,8 @@
 package se.yrgo;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.physics.box2d.*;
+
+import java.nio.file.Path;
 
 public class LoadAssets {
 
@@ -24,6 +25,7 @@ public class LoadAssets {
 
         return pBody;
     }
+
     // Skapa hinder (kinimatiska boxar)
     public static Body createKinimaticBody(World world, float SCALE, int radius, int x, int y) {
         Body pBody;
@@ -39,6 +41,15 @@ public class LoadAssets {
         shape.dispose();
 
         return pBody;
+    }
+
+    public static int getHighScore() {
+        int highScore = 0;
+
+        Path path = Path.of("highScore.txt");
+
+
+        return highScore;
     }
 }
 
