@@ -4,10 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.PixmapIO;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -22,7 +21,8 @@ import java.util.Iterator;
 
 public class JumpyBirbScreen implements Screen {
 
-    private Texture rocket;
+    private Texture spaceship;
+    private Texture spaceshipSheet;
     private Texture space;
     private Texture astroid;
     private OrthographicCamera camera;
@@ -31,6 +31,8 @@ public class JumpyBirbScreen implements Screen {
     private Body player;
     private Array<Body> obstacles;
     private Box2DDebugRenderer boxDebugger;
+    Animation<TextureRegion> spaceshipAnimation;
+    float elapsedTime;
 
     // Skalar grafiken
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -38,6 +40,7 @@ public class JumpyBirbScreen implements Screen {
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
     private long lastObstacleTime;
+    private static final int FRAME_COLS = 2, FRAME_ROWS = 2;
 
     private final ScreenHandler game;
 
@@ -57,6 +60,8 @@ public class JumpyBirbScreen implements Screen {
 
         loadImages();
 
+        spaceShipFlames();
+
         //Creating SpriteBatch
         batch = new SpriteBatch();
 
@@ -65,21 +70,42 @@ public class JumpyBirbScreen implements Screen {
 
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
+    }
+
+    private void spaceShipFlames() {
+        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFiRE.png"));
+
+        TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth()/ FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
+
+        TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int index = 0;
 
 
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                animationFrames[index++] = tmpFrames[i][j];
+            }
+        }
+        spaceshipAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
+        elapsedTime = 0f;
     }
 
     @Override
     public void render(float delta) {
+        elapsedTime += Gdx.graphics.getDeltaTime();
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.graphics.setContinuousRendering(true);
         ScreenUtils.clear(0, 0, 0.2f, 1);
-
+        TextureRegion currentFrame = spaceshipAnimation.getKeyFrame(elapsedTime, false);
         update(Gdx.graphics.getDeltaTime());
 
         //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
         batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
-        batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        }
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
         }
@@ -88,7 +114,6 @@ public class JumpyBirbScreen implements Screen {
         // Behövs bara för debugging.
         boxDebugger.render(world, camera.combined);
     }
-
 
     private void checkForCollison() {
         int numberContacts = world.getContactCount();
@@ -140,7 +165,7 @@ public class JumpyBirbScreen implements Screen {
 
     // Hoppa med space
     private void jumpWithSpaceAndMouseClick(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
             player.applyForceToCenter(0, 100000000, false);
         }
     }
@@ -156,7 +181,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void loadImages() {
-        rocket = new Texture("rocket.png");
+        spaceship = new Texture("spaceship.png");
         space = new Texture("space.png");
         astroid = new Texture("astroid.png");
     }
@@ -166,6 +191,7 @@ public class JumpyBirbScreen implements Screen {
         world.dispose();
         boxDebugger.dispose();
         batch.dispose();
+        spaceshipSheet.dispose();
     }
 
 
@@ -194,6 +220,7 @@ public class JumpyBirbScreen implements Screen {
 
     private void gameOverMenu() {
         game.setScreen(new GameOverScreen(game));
+
     }
 
     @Override
