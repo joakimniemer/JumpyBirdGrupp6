@@ -74,7 +74,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void spaceShipFlames() {
-        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFiRE.png"));
+        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFIRE.png"));
 
         TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth()/ FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
 
@@ -106,7 +106,7 @@ public class JumpyBirbScreen implements Screen {
         batch.begin();
         batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) ) {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         }
         for (Body obstacle : obstacles) {
