@@ -95,11 +95,12 @@ public class JumpyBirbScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        elapsedTime += Gdx.graphics.getDeltaTime();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.graphics.setContinuousRendering(true);
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+
+        elapsedTime += Gdx.graphics.getDeltaTime();
         TextureRegion currentFrame = spaceshipAnimation.getKeyFrame(elapsedTime, false);
+
         update(Gdx.graphics.getDeltaTime());
 
         //Batch, ritar ut spelare, hinder och bakgrund
