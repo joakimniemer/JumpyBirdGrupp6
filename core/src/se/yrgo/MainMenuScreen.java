@@ -39,7 +39,7 @@ public class MainMenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! ", 100, 150);
+        game.font.draw(game.batch, "Press space to start", 50, 50);
         game.batch.draw(playButtonImg, 100, 100, 300, 150);
         game.batch.end();
 

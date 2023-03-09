@@ -2,6 +2,8 @@ package se.yrgo;
 
 import com.badlogic.gdx.physics.box2d.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class LoadAssets {
@@ -48,6 +50,12 @@ public class LoadAssets {
 
         Path path = Path.of("highScore.txt");
 
+        try {
+            String highScoreString = Files.readString(path);
+            highScore = Integer.parseInt(String.valueOf(highScoreString));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return highScore;
     }
