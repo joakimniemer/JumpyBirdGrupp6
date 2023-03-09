@@ -27,6 +27,7 @@ public class JumpyBirbScreen implements Screen {
     private Body player;
     private Array<Body> obstacles;
     private Box2DDebugRenderer boxDebugger;
+    private int currentRoundScore;
 
     // Skalar grafiken
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -62,6 +63,9 @@ public class JumpyBirbScreen implements Screen {
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
 
+        // Initierar poängen, skall vara 0 när vi kan räkna poäng
+        currentRoundScore = 33;
+
     }
 
     @Override
@@ -90,9 +94,15 @@ public class JumpyBirbScreen implements Screen {
         if (numberContacts > 0) {
             Gdx.graphics.setContinuousRendering(false);
             Gdx.graphics.requestRendering();
-            gameOverMenu();
+            LoadAssets.updateHighScore(currentRoundScore);
+            gameOverMenu(currentRoundScore);
+        }
+        if (player.getPosition().y < 0 || player.getPosition().y > 400) {
+            LoadAssets.updateHighScore(currentRoundScore);
+            gameOverMenu(currentRoundScore);
         }
     }
+
 
     // Uppdatera box2D i render
     public void update(float delta) {
@@ -187,8 +197,8 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-    private void gameOverMenu() {
-        game.setScreen(new GameOverScreen(game));
+    private void gameOverMenu(int score) {
+        game.setScreen(new GameOverScreen(game, score));
     }
 
     @Override
