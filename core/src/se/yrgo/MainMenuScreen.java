@@ -16,19 +16,13 @@ public class MainMenuScreen implements Screen {
     OrthographicCamera camera;
 
 
-
     public MainMenuScreen(final ScreenHandler game) {
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
-
-        //playBox = createBox(32, 16, false, 100, 300);
-
         playButtonImg = new Texture("play.png");
     }
-
-
 
 
     @Override
@@ -47,10 +41,6 @@ public class MainMenuScreen implements Screen {
             game.setScreen((new JumpyBirbScreen(game)));
             dispose();
         }
-
-
-
-
     }
 
     private void PlayButton() {

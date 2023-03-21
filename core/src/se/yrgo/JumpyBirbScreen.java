@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -34,6 +35,7 @@ public class JumpyBirbScreen implements Screen {
     private int currentRoundScore;
     private Animation<TextureRegion> spaceshipAnimation;
     private float elapsedTime;
+    public BitmapFont font;
 
     // Skalar grafiken
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -41,12 +43,14 @@ public class JumpyBirbScreen implements Screen {
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
     private long lastObstacleTime;
+    private long scoreTimer;
     private static final int FRAME_COLS = 2, FRAME_ROWS = 2;
 
     private final ScreenHandler game;
 
     public JumpyBirbScreen(final ScreenHandler game) {
         this.game = game;
+        font = new BitmapFont();
 
         // camera TODO: SCALE på camera ger ingen funktion??
         camera = new OrthographicCamera();
@@ -71,27 +75,13 @@ public class JumpyBirbScreen implements Screen {
 
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
+
+        // Initierar poängen och starta poängräknaren
+        currentRoundScore = 0;
+        scoreTimer = System.nanoTime();
+
     }
 
-    private void spaceShipFlames() {
-        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFIRE.png"));
-
-        TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth()/ FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
-
-        TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
-        int index = 0;
-
-        // Initierar poängen, skall vara 0 när vi kan räkna poäng
-        currentRoundScore = 33;
-
-        for (int i = 0; i < 2; i++) {
-            for (int j = 0; j < 2; j++) {
-                animationFrames[index++] = tmpFrames[i][j];
-            }
-        }
-        spaceshipAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
-        elapsedTime = 0f;
-    }
 
     @Override
     public void render(float delta) {
@@ -107,16 +97,24 @@ public class JumpyBirbScreen implements Screen {
         batch.begin();
         batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) ) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         }
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
         }
+        font.draw(batch, String.format("Score: %d", currentRoundScore), 150, 380);
         batch.end();
+
+        //räknar och sätter poäng.
+        scoreCounter();
 
         // Behövs bara för debugging.
         boxDebugger.render(world, camera.combined);
+    }
+
+    private void scoreCounter() {
+        currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
     }
 
     private void checkForCollison() {
@@ -142,6 +140,22 @@ public class JumpyBirbScreen implements Screen {
         checkForCollison();
         disposeObstacles();
         batch.setProjectionMatrix(camera.combined);
+    }
+
+    // Animation för elden
+    private void spaceShipFlames() {
+        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFIRE.png"));
+        TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth() / FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
+        TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int index = 0;
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                animationFrames[index++] = tmpFrames[i][j];
+            }
+        }
+        spaceshipAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
+        elapsedTime = 0f;
     }
 
     //Spawna nya hinder
@@ -175,7 +189,7 @@ public class JumpyBirbScreen implements Screen {
 
     // Hoppa med space
     private void jumpWithSpaceAndMouseClick(float delta) {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)){
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
         }
     }
