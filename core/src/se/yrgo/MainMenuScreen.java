@@ -75,7 +75,6 @@ public class MainMenuScreen implements Screen {
             dispose();
         }
 
-        Buttons
     }
 
     private void scoreButton() {
