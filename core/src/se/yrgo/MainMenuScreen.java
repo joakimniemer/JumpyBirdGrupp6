@@ -51,7 +51,7 @@ public class MainMenuScreen implements Screen {
         //positionera bild timmsannas med rectangle
         game.batch.draw(playButtonImg, 100, 100,100,100);
 
-        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! ", 250, 700);
+        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! Press space to start", 250, 700);
         playButton();
         game.batch.draw(playButtonImg, camera.viewportWidth / 2 - buttonWidth / 2, 300, buttonWidth, buttonHeight);
         exitButton();
@@ -74,6 +74,7 @@ public class MainMenuScreen implements Screen {
             dispose();
             game.setScreen(new JumpyBirbScreen(game));
         }
+
     }
 
     private void scoreButton() {
@@ -91,9 +92,9 @@ public class MainMenuScreen implements Screen {
         if (Gdx.input.getX() < xAxis + buttonWidth && Gdx.input.getX() > xAxis && camera.viewportHeight - Gdx.input.getY() < 100 + buttonHeight && camera.viewportHeight - Gdx.input.getY() > 100) {
             game.batch.draw(exitButtonImg, camera.viewportWidth / 2 - buttonWidth / 2, 100, buttonWidth, buttonHeight);
         }
-        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
-            Gdx.app.exit();
-        }
+//        if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+//            Gdx.app.exit();
+//        }
     }
 
     public void show() {
