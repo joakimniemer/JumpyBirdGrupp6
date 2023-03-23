@@ -42,6 +42,7 @@ public class JumpyBirbScreen implements Screen {
     private final float SCALE = 2.0f;
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
+    private final float spawnTimer = 1f;
     private long lastObstacleTime;
     private long scoreTimer;
     private static final int FRAME_COLS = 2, FRAME_ROWS = 2;
@@ -120,15 +121,23 @@ public class JumpyBirbScreen implements Screen {
     private void checkForCollison() {
         int numberContacts = world.getContactCount();
         if (numberContacts > 0) {
-            Gdx.graphics.setContinuousRendering(false);
-            Gdx.graphics.requestRendering();
-            LoadAssets.updateHighScore(currentRoundScore);
-            gameOverMenu(currentRoundScore);
+            conflictWithObstacle();
         }
         if (player.getPosition().y < 0 || player.getPosition().y > 400) {
-            LoadAssets.updateHighScore(currentRoundScore);
-            gameOverMenu(currentRoundScore);
+            conflictWithEdge();
         }
+    }
+
+    private void conflictWithEdge() {
+        LoadAssets.updateHighScore(currentRoundScore);
+        gameOverMenu(currentRoundScore);
+    }
+
+    private void conflictWithObstacle() {
+        Gdx.graphics.setContinuousRendering(false);
+        Gdx.graphics.requestRendering();
+        LoadAssets.updateHighScore(currentRoundScore);
+        gameOverMenu(currentRoundScore);
     }
 
 
@@ -181,7 +190,7 @@ public class JumpyBirbScreen implements Screen {
 
     // Räknar tid mellan hindren
     private void continuouslySpawningObstacles() {
-        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > 0.2) {
+        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > spawnTimer) {
             spawnObstacle();
             //TODO: Måste lösa så att hindren tas bort när dom är utanför banan.
         }

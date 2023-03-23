@@ -71,8 +71,8 @@ public class MainMenuScreen implements Screen {
 
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
-            game.setScreen(new JumpyBirbScreen(game));
             dispose();
+            game.setScreen(new JumpyBirbScreen(game));
         }
     }
 
