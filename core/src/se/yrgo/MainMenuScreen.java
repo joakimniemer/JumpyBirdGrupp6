@@ -74,6 +74,8 @@ public class MainMenuScreen implements Screen {
             dispose();
           game.setScreen(new JumpyBirbScreen(game));
         }
+
+        Buttons
     }
 
     private void scoreButton() {
