@@ -73,10 +73,10 @@ public class JumpyBirbScreen implements Screen {
         spaceShipFlames();
 
         backGround = new Texture[4];
-        backGround[0] = new Texture("Starscape00.png");
-        backGround[1] = new Texture("Starscape01.png");
-        backGround[2] = new Texture("Starscape02.png");
-        backGround[3] = new Texture("Starscape03.png");
+        backGround[0] = new Texture("bg1.png");
+        backGround[1] = new Texture("bg2.png");
+        backGround[2] = new Texture("bg3.png");
+        backGround[3] = new Texture("bg4.png");
 
         backGroundMaxSrollingSpeed = (float)(WORLD_WIDTH) / 70;
 
