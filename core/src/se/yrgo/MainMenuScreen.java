@@ -22,14 +22,15 @@ public class MainMenuScreen implements Screen {
     final ScreenHandler game;
     OrthographicCamera camera;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fc308d56a6a4e7bf4ccf54c06e1b6925847a4e1c
     public MainMenuScreen(final ScreenHandler game) {
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
-
-        //playBox = createBox(32, 16, false, 100, 300);
-
         playButtonImg = new Texture("play.png");
         //scoreButtonImg = new Texture("score.png");
         exitButtonImg = new Texture("exit.png");
@@ -37,6 +38,10 @@ public class MainMenuScreen implements Screen {
 
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> fc308d56a6a4e7bf4ccf54c06e1b6925847a4e1c
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0, 0, 1f, 1);
@@ -45,11 +50,16 @@ public class MainMenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
+<<<<<<< HEAD
 
         game.font.draw(game.batch, "Welcome to Jumpy Birb!!! ", 250, 700);
         playButton();
         game.batch.draw(playButtonImg,  camera.viewportWidth / 2 - buttonWidth / 2, 300, buttonWidth, buttonHeight);
         exitButton();
+=======
+        game.font.draw(game.batch, "Press space to start", 50, 50);
+        game.batch.draw(playButtonImg, 100, 100, 300, 150);
+>>>>>>> fc308d56a6a4e7bf4ccf54c06e1b6925847a4e1c
         game.batch.end();
 
     }

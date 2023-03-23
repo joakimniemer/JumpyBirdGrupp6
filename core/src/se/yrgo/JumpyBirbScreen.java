@@ -5,7 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -18,7 +22,8 @@ import java.util.Iterator;
 
 public class JumpyBirbScreen implements Screen {
 
-    private Texture rocket;
+    private Texture spaceship;
+    private Texture spaceshipSheet;
     private Texture space;
     private Texture astroid;
     private OrthographicCamera camera;
@@ -27,6 +32,10 @@ public class JumpyBirbScreen implements Screen {
     private Body player;
     private Array<Body> obstacles;
     private Box2DDebugRenderer boxDebugger;
+    private int currentRoundScore;
+    private Animation<TextureRegion> spaceshipAnimation;
+    private float elapsedTime;
+    public BitmapFont font;
 
     // Skalar grafiken
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -34,11 +43,14 @@ public class JumpyBirbScreen implements Screen {
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
     private long lastObstacleTime;
+    private long scoreTimer;
+    private static final int FRAME_COLS = 2, FRAME_ROWS = 2;
 
     private final ScreenHandler game;
 
     public JumpyBirbScreen(final ScreenHandler game) {
         this.game = game;
+        font = new BitmapFont();
 
         // camera TODO: SCALE på camera ger ingen funktion??
         camera = new OrthographicCamera();
@@ -53,6 +65,8 @@ public class JumpyBirbScreen implements Screen {
 
         loadImages();
 
+        spaceShipFlames();
+
         //Creating SpriteBatch
         batch = new SpriteBatch();
 
@@ -62,34 +76,61 @@ public class JumpyBirbScreen implements Screen {
         //Skapar Array för obstacles
         obstacles = new Array<Body>();
 
+        // Initierar poängen och starta poängräknaren
+        currentRoundScore = 0;
+        scoreTimer = System.nanoTime();
+
     }
+
 
     @Override
     public void render(float delta) {
-        ScreenUtils.clear(0, 0, 0.2f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        Gdx.graphics.setContinuousRendering(true);
+
+        elapsedTime += Gdx.graphics.getDeltaTime();
+        TextureRegion currentFrame = spaceshipAnimation.getKeyFrame(elapsedTime, false);
 
         update(Gdx.graphics.getDeltaTime());
 
         //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
         batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
-        batch.draw(rocket, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+            batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+        }
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
         }
+        font.draw(batch, String.format("Score: %d", currentRoundScore), 150, 380);
         batch.end();
+
+        //räknar och sätter poäng.
+        scoreCounter();
 
         // Behövs bara för debugging.
         boxDebugger.render(world, camera.combined);
     }
 
+    private void scoreCounter() {
+        currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
+    }
 
     private void checkForCollison() {
         int numberContacts = world.getContactCount();
         if (numberContacts > 0) {
-            gameOverMenu();
+            Gdx.graphics.setContinuousRendering(false);
+            Gdx.graphics.requestRendering();
+            LoadAssets.updateHighScore(currentRoundScore);
+            gameOverMenu(currentRoundScore);
+        }
+        if (player.getPosition().y < 0 || player.getPosition().y > 400) {
+            LoadAssets.updateHighScore(currentRoundScore);
+            gameOverMenu(currentRoundScore);
         }
     }
+
 
     // Uppdatera box2D i render
     public void update(float delta) {
@@ -99,6 +140,22 @@ public class JumpyBirbScreen implements Screen {
         checkForCollison();
         disposeObstacles();
         batch.setProjectionMatrix(camera.combined);
+    }
+
+    // Animation för elden
+    private void spaceShipFlames() {
+        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFIRE.png"));
+        TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth() / FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
+        TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+        int index = 0;
+
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                animationFrames[index++] = tmpFrames[i][j];
+            }
+        }
+        spaceshipAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
+        elapsedTime = 0f;
     }
 
     //Spawna nya hinder
@@ -148,7 +205,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void loadImages() {
-        rocket = new Texture("rocket.png");
+        spaceship = new Texture("spaceship.png");
         space = new Texture("space.png");
         astroid = new Texture("astroid.png");
     }
@@ -158,6 +215,7 @@ public class JumpyBirbScreen implements Screen {
         world.dispose();
         boxDebugger.dispose();
         batch.dispose();
+        spaceshipSheet.dispose();
     }
 
 
@@ -184,8 +242,8 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-    private void gameOverMenu() {
-        game.setScreen(new GameOverScreen(game));
+    private void gameOverMenu(int score) {
+        game.setScreen(new GameOverScreen(game, score));
     }
 
     @Override
