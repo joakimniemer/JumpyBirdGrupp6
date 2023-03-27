@@ -24,7 +24,10 @@ public class JumpyBirbScreen implements Screen {
 
     private Texture spaceship;
     private Texture spaceshipSheet;
-    private Texture space;
+    private Texture[] backGround;
+    //Timing
+    private float[] backGroundOffset = {0,0,0,0};
+    private float backGroundMaxSrollingSpeed;
     private Texture astroid;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -36,6 +39,8 @@ public class JumpyBirbScreen implements Screen {
     private Animation<TextureRegion> spaceshipAnimation;
     private float elapsedTime;
     public BitmapFont font;
+    private final int WORLD_HEIGHT = 800;
+    private final int WORLD_WIDTH = 700;
 
     // Skalar grafiken
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -68,6 +73,14 @@ public class JumpyBirbScreen implements Screen {
 
         spaceShipFlames();
 
+        backGround = new Texture[4];
+        backGround[0] = new Texture("bg1.png");
+        backGround[1] = new Texture("bg2.png");
+        backGround[2] = new Texture("bg3.png");
+        backGround[3] = new Texture("bg4.png");
+
+        backGroundMaxSrollingSpeed = (float)(WORLD_WIDTH) / 70;
+
         //Creating SpriteBatch
         batch = new SpriteBatch();
 
@@ -96,7 +109,10 @@ public class JumpyBirbScreen implements Screen {
 
         //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
-        batch.draw(space, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
+
+        renderBackground(elapsedTime);
+
+      /*  batch.draw(backGround, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);*/
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
@@ -112,6 +128,22 @@ public class JumpyBirbScreen implements Screen {
 
         // Behövs bara för debugging.
         boxDebugger.render(world, camera.combined);
+    }
+
+    private void renderBackground(float elapsedTime) {
+     backGroundOffset[0] += elapsedTime * backGroundMaxSrollingSpeed / 30;
+     backGroundOffset[1] += elapsedTime * backGroundMaxSrollingSpeed / 50;
+     backGroundOffset[2] += elapsedTime * backGroundMaxSrollingSpeed / 30;
+     backGroundOffset[3] += elapsedTime * backGroundMaxSrollingSpeed / 70;
+
+     for (int layer = 0; layer < backGroundOffset.length; layer++) {
+        if (backGroundOffset[layer] > WORLD_WIDTH) {
+            backGroundOffset[layer] = 0;
+        }
+        batch.draw(backGround[layer], -backGroundOffset[layer], 0);
+        batch.draw(backGround[layer], -backGroundOffset[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, 0);
+     }
+
     }
 
     private void scoreCounter() {
@@ -153,7 +185,7 @@ public class JumpyBirbScreen implements Screen {
 
     // Animation för elden
     private void spaceShipFlames() {
-        spaceshipSheet = new Texture(Gdx.files.internal("spaceshipSheetFIRE.png"));
+        spaceshipSheet = new Texture(Gdx.files.internal("FIRE.png"));
         TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth() / FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
         TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
@@ -215,7 +247,7 @@ public class JumpyBirbScreen implements Screen {
 
     private void loadImages() {
         spaceship = new Texture("spaceship.png");
-        space = new Texture("space.png");
+       /* backGround = new Texture("space.png");*/
         astroid = new Texture("astroid.png");
     }
 
