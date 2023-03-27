@@ -14,7 +14,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 
 import java.util.Iterator;
@@ -23,34 +22,45 @@ import java.util.Iterator;
 public class JumpyBirbScreen implements Screen {
 
     private Texture spaceship;
-    private Texture spaceshipSheet;
+
     private Texture[] backGround;
-    //Timing
-    private float[] backGroundOffset = {0,0,0,0};
-    private float backGroundMaxSrollingSpeed;
     private Texture astroid;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    private World world;
-    private Body player;
-    private Array<Body> obstacles;
-    private Box2DDebugRenderer boxDebugger;
-    private int currentRoundScore;
-    private Animation<TextureRegion> spaceshipAnimation;
-    private float elapsedTime;
     public BitmapFont font;
-    private final int WORLD_HEIGHT = 800;
-    private final int WORLD_WIDTH = 700;
 
-    // Skalar grafiken
+    // box2d variabler
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
     private final float SCALE = 2.0f;
     private final float worldGravity = -300f;
     private final int speedObstacle = -125;
     private final float spawnTimer = 1f;
     private long lastObstacleTime;
+    private Box2DDebugRenderer boxDebugger;
+    private World world;
+    private Body player;
+    private Array<Body> obstacles;
+
+    //poängs variabler
+    private int currentRoundScore;
     private long scoreTimer;
+
+    //animations variabler
     private static final int FRAME_COLS = 2, FRAME_ROWS = 2;
+    private Animation<TextureRegion> fireAnimation;
+    private float elapsedTime;
+    private Texture animationSheet;
+    private long jumpStartTime;
+    private int animationDuration = 3; //Tiondels-sekunder
+
+
+    //bakgrundsbild variabler
+    //Timing
+    private float[] backGroundOffset = {0, 0, 0, 0};
+    private float backGroundMaxSrollingSpeed;
+    private final int WORLD_HEIGHT = 800;
+    private final int WORLD_WIDTH = 700;
+
 
     private final ScreenHandler game;
 
@@ -70,8 +80,7 @@ public class JumpyBirbScreen implements Screen {
         player = LoadAssets.createBox(world, SCALE, 32, 16, false, 100, 300);
 
         loadImages();
-
-        spaceShipFlames();
+        flamesAnimation();
 
         backGround = new Texture[4];
         backGround[0] = new Texture("bg1.png");
@@ -79,7 +88,7 @@ public class JumpyBirbScreen implements Screen {
         backGround[2] = new Texture("bg3.png");
         backGround[3] = new Texture("bg4.png");
 
-        backGroundMaxSrollingSpeed = (float)(WORLD_WIDTH) / 70;
+        backGroundMaxSrollingSpeed = (float) (WORLD_WIDTH) / 70;
 
         //Creating SpriteBatch
         batch = new SpriteBatch();
@@ -103,7 +112,7 @@ public class JumpyBirbScreen implements Screen {
         Gdx.graphics.setContinuousRendering(true);
 
         elapsedTime += Gdx.graphics.getDeltaTime();
-        TextureRegion currentFrame = spaceshipAnimation.getKeyFrame(elapsedTime, false);
+        TextureRegion currentFrame = fireAnimation.getKeyFrame(elapsedTime, true);
 
         update(Gdx.graphics.getDeltaTime());
 
@@ -112,11 +121,14 @@ public class JumpyBirbScreen implements Screen {
 
         renderBackground(elapsedTime);
 
-      /*  batch.draw(backGround, 0, 0, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);*/
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-            batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
+            setJumpTimer();
         }
+        if (jumpTrue()) {
+            batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 60, 32, 55);
+        }
+
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
         }
@@ -130,20 +142,32 @@ public class JumpyBirbScreen implements Screen {
         boxDebugger.render(world, camera.combined);
     }
 
-    private void renderBackground(float elapsedTime) {
-     backGroundOffset[0] += elapsedTime * backGroundMaxSrollingSpeed / 30;
-     backGroundOffset[1] += elapsedTime * backGroundMaxSrollingSpeed / 50;
-     backGroundOffset[2] += elapsedTime * backGroundMaxSrollingSpeed / 30;
-     backGroundOffset[3] += elapsedTime * backGroundMaxSrollingSpeed / 70;
 
-     for (int layer = 0; layer < backGroundOffset.length; layer++) {
-        if (backGroundOffset[layer] > WORLD_WIDTH) {
-            backGroundOffset[layer] = 0;
+    private boolean jumpTrue() {
+        if ((((System.nanoTime()) - jumpStartTime) / 100000000) < animationDuration) {
+            return true;
         }
-        batch.draw(backGround[layer], -backGroundOffset[layer], 0);
-        batch.draw(backGround[layer], -backGroundOffset[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, 0);
-     }
+        return false;
+    }
 
+    private void setJumpTimer() {
+        jumpStartTime = System.nanoTime();
+    }
+
+
+    private void renderBackground(float elapsedTime) {
+        backGroundOffset[0] += elapsedTime * backGroundMaxSrollingSpeed / 30;
+        backGroundOffset[1] += elapsedTime * backGroundMaxSrollingSpeed / 50;
+        backGroundOffset[2] += elapsedTime * backGroundMaxSrollingSpeed / 30;
+        backGroundOffset[3] += elapsedTime * backGroundMaxSrollingSpeed / 70;
+
+        for (int layer = 0; layer < backGroundOffset.length; layer++) {
+            if (backGroundOffset[layer] > WORLD_WIDTH) {
+                backGroundOffset[layer] = 0;
+            }
+            batch.draw(backGround[layer], -backGroundOffset[layer], 0);
+            batch.draw(backGround[layer], -backGroundOffset[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, 0);
+        }
     }
 
     private void scoreCounter() {
@@ -184,20 +208,31 @@ public class JumpyBirbScreen implements Screen {
     }
 
     // Animation för elden
-    private void spaceShipFlames() {
-        spaceshipSheet = new Texture(Gdx.files.internal("FIRE.png"));
-        TextureRegion[][] tmpFrames = TextureRegion.split(spaceshipSheet, spaceshipSheet.getWidth() / FRAME_ROWS, spaceshipSheet.getHeight() / FRAME_COLS);
+    private void flamesAnimation() {
+        //Laddar in bilden some en texture
+        animationSheet = new Texture("FIRESheet.png");
+
+        //Delar upp bilden i fyra lika stora delar. FRAME_COLS och FRAME_ROWS är 2x2 eftersom det är fyra bilder
+        TextureRegion[][] arrayOfSplitPictures = TextureRegion.split(animationSheet,
+                animationSheet.getWidth() / FRAME_ROWS,
+                animationSheet.getHeight() / FRAME_COLS);
+
+        //Skapa en 1D array av de fyra bilderna och lägger dem i ordning, börjar från top-left.
         TextureRegion[] animationFrames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
         int index = 0;
-
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
-                animationFrames[index++] = tmpFrames[i][j];
+                animationFrames[index++] = arrayOfSplitPictures[i][j];
             }
         }
-        spaceshipAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
+
+        //Skapar animationen och bestämmer "frame interval" och array av frames att loopa
+        fireAnimation = new Animation<TextureRegion>(0.25f, animationFrames);
+
+        //Sätter elapsed animation tid till 0. TODO: Behövs denna verkligen för animation?
         elapsedTime = 0f;
     }
+
 
     //Spawna nya hinder
     private void spawnObstacle() {
@@ -220,11 +255,10 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-    // Räknar tid mellan hindren
+    // Räknar tid mellan hindren och anropar spawnObstacle();
     private void continuouslySpawningObstacles() {
         if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > spawnTimer) {
             spawnObstacle();
-            //TODO: Måste lösa så att hindren tas bort när dom är utanför banan.
         }
     }
 
@@ -247,7 +281,6 @@ public class JumpyBirbScreen implements Screen {
 
     private void loadImages() {
         spaceship = new Texture("spaceship.png");
-       /* backGround = new Texture("space.png");*/
         astroid = new Texture("astroid.png");
     }
 
@@ -256,7 +289,7 @@ public class JumpyBirbScreen implements Screen {
         world.dispose();
         boxDebugger.dispose();
         batch.dispose();
-        spaceshipSheet.dispose();
+        animationSheet.dispose();
     }
 
 
@@ -291,12 +324,7 @@ public class JumpyBirbScreen implements Screen {
     public void show() {
 
     }
-
-    public void exitGame() {
-        Gdx.app.exit();
-    }
-
-
 }
+
 
 
