@@ -20,7 +20,17 @@ public class MainMenuScreen implements Screen {
     private Body playBox;
     final ScreenHandler game;
     OrthographicCamera camera;
-    Rectangle rec;
+
+    Rectangle recEasy;
+    Rectangle recMedium;
+    Rectangle recHard;
+    Texture easy;
+    Texture easySelected;
+    Texture medium;
+    Texture mediumSelected;
+    Texture hard;
+    Texture hardSelected;
+    int difficulty;
 
 
     public MainMenuScreen(final ScreenHandler game) {
@@ -32,11 +42,20 @@ public class MainMenuScreen implements Screen {
         //scoreButtonImg = new Texture("score.png");
         exitButtonImg = new Texture("exit.png");
 
-        //SKapa en rectangle
-        rec = new Rectangle( 100, 100, 100, 100);
+        //Skapa rectanglar och texturerer för svårighetsgrad
+        recEasy = new Rectangle(75, 600, 100, 100);
+        recMedium = new Rectangle(75, 475, 100, 100);
+        recHard = new Rectangle(75, 350, 100, 100);
+        easy = new Texture("easy.png");
+        easySelected = new Texture("easySelected.png");
+        medium = new Texture("medium.png");
+        mediumSelected = new Texture("mediumSelected.png");
+        hard = new Texture("hard.png");
+        hardSelected = new Texture("hardSelected.png");
 
-
-
+        //Sätter diff:s startvärde till 1 (default blir easy).
+        // OBS! Denna måste också skickas med till gameScreenen
+        difficulty = 1;
     }
 
     @Override
@@ -48,15 +67,51 @@ public class MainMenuScreen implements Screen {
 
         game.batch.begin();
 
-        //positionera bild timmsannas med rectangle
-        game.batch.draw(playButtonImg, 100, 100,100,100);
+        //Väljer svårighetsgrad med 1,2,3
+        chooseDifficulty();
+        //Skriver ut svårighetsgrader och highlightar vald svårighetsgrad (default easy)
+        difficulty();
 
-        game.font.draw(game.batch, "Welcome to Jumpy Birb!!! Press space to start", 250, 700);
+
+        game.font.draw(game.batch, "Welcome to Jumpy Birb!", 250, 700);
+        game.font.draw(game.batch, "Choose difficulty by pressing 1 for easy (default),", 250, 680);
+        game.font.draw(game.batch, "2 for medium and 3 for hard.", 250, 660);
+        game.font.draw(game.batch, "Then press space to start!", 250, 640);
         playButton();
         game.batch.draw(playButtonImg, camera.viewportWidth / 2 - buttonWidth / 2, 300, buttonWidth, buttonHeight);
         exitButton();
         game.batch.end();
 
+    }
+
+    private void chooseDifficulty() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_1)) {
+            difficulty = 1;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_2)) {
+            difficulty = 2;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_3)) {
+            difficulty = 3;
+        }
+    }
+
+    private void difficulty() {
+        if (difficulty == 1) {
+            game.batch.draw(easySelected, recEasy.x, recEasy.y, 100, 100);
+            game.batch.draw(medium, recMedium.x, recMedium.y, 100, 100);
+            game.batch.draw(hard, recHard.x, recHard.y, 100, 100);
+        }
+        if (difficulty == 2) {
+            game.batch.draw(easy, recEasy.x, recEasy.y, 100, 100);
+            game.batch.draw(mediumSelected, recMedium.x, recMedium.y, 100, 100);
+            game.batch.draw(hard, recHard.x, recHard.y, 100, 100);
+        }
+        if (difficulty == 3) {
+            game.batch.draw(easy, recEasy.x, recEasy.y, 100, 100);
+            game.batch.draw(medium, recMedium.x, recMedium.y, 100, 100);
+            game.batch.draw(hardSelected, recHard.x, recHard.y, 100, 100);
+        }
     }
 
     private void playButton() {
@@ -72,7 +127,7 @@ public class MainMenuScreen implements Screen {
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
             dispose();
-            game.setScreen(new JumpyBirbScreen(game));
+            game.setScreen(new JumpyBirbScreen(game, difficulty));
         }
 
     }

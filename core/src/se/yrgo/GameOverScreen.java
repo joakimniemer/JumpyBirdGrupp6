@@ -19,13 +19,15 @@ public class GameOverScreen implements Screen {
     private long enteringScreenTimer;
     private long currentTime;
     private long delayTimer;
+    private int difficulty;
 
-    public GameOverScreen(final ScreenHandler game, int score) {
+    public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
         this.game = game;
         this.currentRoundScore = score;
         this.scan = new Scanner(System.in);
         this.enteringScreenTimer = TimeUtils.nanoTime();
         this.delayTimer = 2000000000;
+        this.difficulty = difficulty;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
@@ -46,7 +48,7 @@ public class GameOverScreen implements Screen {
         game.batch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer()) {
-            game.setScreen(new JumpyBirbScreen(game));
+            game.setScreen(new JumpyBirbScreen(game, difficulty));
             dispose();
         }
     }

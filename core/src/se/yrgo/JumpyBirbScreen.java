@@ -61,10 +61,13 @@ public class JumpyBirbScreen implements Screen {
     private final int WORLD_HEIGHT = 800;
     private final int WORLD_WIDTH = 700;
 
+    //Svårighetsgrad
+    private int difficulty;
+
 
     private final ScreenHandler game;
 
-    public JumpyBirbScreen(final ScreenHandler game) {
+    public JumpyBirbScreen(final ScreenHandler game, int difficulty) {
         this.game = game;
         font = new BitmapFont();
 
@@ -103,6 +106,8 @@ public class JumpyBirbScreen implements Screen {
         currentRoundScore = 0;
         scoreTimer = System.nanoTime();
 
+        //Sätter svårighetsgrad med int från main-menu
+        this.difficulty = difficulty;
     }
 
 
@@ -186,14 +191,14 @@ public class JumpyBirbScreen implements Screen {
 
     private void conflictWithEdge() {
         LoadAssets.updateHighScore(currentRoundScore);
-        gameOverMenu(currentRoundScore);
+        gameOverMenu();
     }
 
     private void conflictWithObstacle() {
         Gdx.graphics.setContinuousRendering(false);
         Gdx.graphics.requestRendering();
         LoadAssets.updateHighScore(currentRoundScore);
-        gameOverMenu(currentRoundScore);
+        gameOverMenu();
     }
 
 
@@ -316,8 +321,8 @@ public class JumpyBirbScreen implements Screen {
 
     }
 
-    private void gameOverMenu(int score) {
-        game.setScreen(new GameOverScreen(game, score));
+    private void gameOverMenu() {
+        game.setScreen(new GameOverScreen(game, currentRoundScore, difficulty));
     }
 
     @Override
