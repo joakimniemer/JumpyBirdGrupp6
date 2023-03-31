@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.Scanner;
 
@@ -32,7 +34,9 @@ public class GameOverScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
         highScore = LoadAssets.getHighScore();
+
     }
+
 
 
     @Override
@@ -45,6 +49,10 @@ public class GameOverScreen implements Screen {
         game.font.draw(game.batch, String.format("You got %d score!", currentRoundScore), 175, 350);
         game.font.draw(game.batch, String.format("All time highscore is: %d", highScore), 175, 300);
         game.font.draw(game.batch, "Press space to restart! (2sec freeze delay)", 175, 250);
+        game.font.draw(game.batch, "Or press 'ESC' to get back to the main menu", 175, 200);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            game.setScreen((new MainMenuScreen(game)));
+        }
         game.batch.end();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer()) {

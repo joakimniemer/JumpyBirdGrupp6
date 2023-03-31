@@ -159,13 +159,14 @@ public class JumpyBirbScreen implements Screen {
         jumpStartTime = System.nanoTime();
     }
 
-
+    //Array av olika bakgrundsbilder
     private void renderBackground(float elapsedTime) {
         backGroundOffset[0] += elapsedTime * backGroundMaxSrollingSpeed / 30;
         backGroundOffset[1] += elapsedTime * backGroundMaxSrollingSpeed / 50;
         backGroundOffset[2] += elapsedTime * backGroundMaxSrollingSpeed / 30;
         backGroundOffset[3] += elapsedTime * backGroundMaxSrollingSpeed / 70;
 
+        //Loop för bakgrundsbilder. Ritar ut bilderna på X-axeln
         for (int layer = 0; layer < backGroundOffset.length; layer++) {
             if (backGroundOffset[layer] > WORLD_WIDTH) {
                 backGroundOffset[layer] = 0;
