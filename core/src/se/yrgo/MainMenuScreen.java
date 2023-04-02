@@ -7,11 +7,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class MainMenuScreen implements Screen {
-    private static final int buttonWidth = 300;
-    private static final int buttonHeight = 150;
 
     private enum Buttons {
         PLAY, SCORE, EXIT;
@@ -19,7 +20,13 @@ public class MainMenuScreen implements Screen {
 
     private Buttons buttonSelected;
     private boolean highScoreShow;
-    private Texture highScoreTabBackGround;
+    private Texture diffBackground;
+    private Stage stage;
+    private Stage stageTwo;
+    private String instructionsOne = "Choose difficulty:\n1 for easy\n2 for medium\n3 for hard";
+    private String instructionsTwo = "Move in the menu\nwith up/down\nselect with space";
+    private String instructionsThree = "(Exit with backspace)";
+    private float instructionsShowTimer;
 
 
     //Menyknappar
@@ -91,9 +98,13 @@ public class MainMenuScreen implements Screen {
         //Initerar highScoreMenu till false för att dölja den tills det väljs
         highScoreShow = false;
 
-        //ladda highscore tab bakgrund
-        highScoreTabBackGround = new Texture("highScoreTab.png");
+        //ladda highscore diff bakgrund
+        diffBackground = new Texture("difficultysBackground.png");
+
+        createText();
+
     }
+
 
     @Override
     public void render(float delta) {
@@ -101,6 +112,9 @@ public class MainMenuScreen implements Screen {
 
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+
+        //skriva text med Stage, Label och Skin (med en timer som blinkar)
+        blinkingInstructions(delta);
 
         game.batch.begin();
         //Väljer svårighetsgrad med 1,2,3
@@ -111,24 +125,70 @@ public class MainMenuScreen implements Screen {
         menuButtons();
         //Bläddra i menyn med piltangenterna
         moveInMenu();
-
-
-        game.font.draw(game.batch, "Welcome to Jumpy Birb!", 250, 750);
-        game.font.draw(game.batch, "Choose difficulty by pressing 1 for easy (default),", 250, 730);
-        game.font.draw(game.batch, "2 for medium and 3 for hard.", 250, 710);
-        game.font.draw(game.batch, "Move in the menu with \"up\" and \"down\".", 250, 690);
-        game.font.draw(game.batch, "Select with space", 250, 670);
-
         //Highscore menu
-        highScoreMenu();
+        highScoreMenu(delta);
         game.batch.end();
+
 
     }
 
-    private void highScoreMenu() {
+    private void createText() {
+        //Skapa font
+        Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+        Label labelOne = new Label(instructionsOne, mySkin, "over");
+        labelOne.setSize(100, 100);
+        labelOne.setPosition(30, 700);
+
+        Label labelTwo = new Label(instructionsTwo, mySkin, "over");
+        labelTwo.setSize(100, 100);
+        labelTwo.setPosition(500, 500);
+
+        Label highScoreText = new Label(String.format("All time highscore: %d", LoadAssets.getHighScore()), mySkin, "over");
+        highScoreText.setSize(100, 100);
+        highScoreText.setPosition(240, 550);
+
+        List highscoreBackground = new List(mySkin);
+        TextField toplineHighscoreBackground = new TextField("", mySkin);
+        Label exitHighscoreInstructions = new Label(instructionsThree, mySkin, "over");
+        highscoreBackground.setSize(400, 400);
+        highscoreBackground.setPosition(150, 250);
+        toplineHighscoreBackground.setSize(385, 20);
+        toplineHighscoreBackground.setPosition(158, 645);
+        exitHighscoreInstructions.setSize(100, 100);
+        exitHighscoreInstructions.setPosition(250, 230);
+
+        stage = new Stage(new ScreenViewport());
+//        Gdx.input.setInputProcessor(stage); Behövs inte? Vad gör den?
+        stage.addActor(labelOne);
+        stage.addActor(labelTwo);
+
+
+        stageTwo = new Stage(new ScreenViewport());
+        stageTwo.addActor(highscoreBackground);
+        stageTwo.addActor(highScoreText);
+        stageTwo.addActor(toplineHighscoreBackground);
+        stageTwo.addActor(exitHighscoreInstructions);
+
+        //Initiera timer för blinkande text
+        instructionsShowTimer = 0;
+    }
+
+    private void blinkingInstructions(float delta) {
+        instructionsShowTimer += delta;
+        if (instructionsShowTimer < 1.3) {
+            stage.act(delta);
+            stage.draw();
+        }
+        if (instructionsShowTimer > 2.6) {
+            instructionsShowTimer = 0;
+        }
+    }
+
+    private void highScoreMenu(float delta) {
         if (highScoreShow == true) {
-            game.batch.draw(highScoreTabBackGround, 100,100,500,600);
-            game.font.draw(game.batch, String.format("All time highscore: %d", LoadAssets.getHighScore()), 250, 400);
+//            game.batch.draw(highScoreTabBackGround, 100, 100, 500, 600);
+            stageTwo.act(delta);
+            stageTwo.draw();
         }
     }
 
@@ -146,16 +206,19 @@ public class MainMenuScreen implements Screen {
 
     private void difficulty() {
         if (difficulty == 1) {
+            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easySelected, recEasy.x, recEasy.y, 150, 75);
             game.batch.draw(medium, recMedium.x, recMedium.y, 150, 75);
             game.batch.draw(hard, recHard.x, recHard.y, 150, 75);
         }
         if (difficulty == 2) {
+            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easy, recEasy.x, recEasy.y, 150, 75);
             game.batch.draw(mediumSelected, recMedium.x, recMedium.y, 150, 75);
             game.batch.draw(hard, recHard.x, recHard.y, 150, 75);
         }
         if (difficulty == 3) {
+            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easy, recEasy.x, recEasy.y, 150, 75);
             game.batch.draw(medium, recMedium.x, recMedium.y, 150, 75);
             game.batch.draw(hardSelected, recHard.x, recHard.y, 150, 75);
