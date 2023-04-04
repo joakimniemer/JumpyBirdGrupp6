@@ -28,7 +28,7 @@ public class GameOverScreen implements Screen {
         this.currentRoundScore = score;
         this.scan = new Scanner(System.in);
         this.enteringScreenTimer = TimeUtils.nanoTime();
-        this.delayTimer = 2000000000;
+        this.delayTimer = 1000000000;
         this.difficulty = difficulty;
 
         camera = new OrthographicCamera();
