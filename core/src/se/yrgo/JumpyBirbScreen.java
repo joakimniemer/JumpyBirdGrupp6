@@ -7,14 +7,17 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.Iterator;
 
@@ -27,7 +30,9 @@ public class JumpyBirbScreen implements Screen {
     private Texture astroid;
     private OrthographicCamera camera;
     private SpriteBatch batch;
-    public BitmapFont font;
+    private Stage stage;
+    private Label scoreText;
+    private Skin mySkin;
 
     // box2d variabler
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -69,7 +74,6 @@ public class JumpyBirbScreen implements Screen {
 
     public JumpyBirbScreen(final ScreenHandler game, int difficulty) {
         this.game = game;
-        font = new BitmapFont();
 
         // camera TODO: SCALE på camera ger ingen funktion??
         camera = new OrthographicCamera();
@@ -108,6 +112,10 @@ public class JumpyBirbScreen implements Screen {
 
         //Sätter svårighetsgrad med int från main-menu
         this.difficulty = difficulty;
+
+        //Skapa text
+        createText();
+
     }
 
 
@@ -137,16 +145,23 @@ public class JumpyBirbScreen implements Screen {
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
         }
-        font.draw(batch, String.format("Score: %d", currentRoundScore), 150, 380);
         batch.end();
 
         //räknar och sätter poäng.
         scoreCounter();
 
+        //Skriv ut text för score
+        updateScoreText(delta);
+
         // Behövs bara för debugging.
         boxDebugger.render(world, camera.combined);
     }
 
+    private void updateScoreText(float delta) {
+        scoreText.setText(String.format("Score: %d", currentRoundScore));
+        stage.act(delta);
+        stage.draw();
+    }
 
     private boolean jumpTrue() {
         if ((((System.nanoTime()) - jumpStartTime) / 100000000) < animationDuration) {
@@ -283,6 +298,16 @@ public class JumpyBirbScreen implements Screen {
                 iter.remove();
             }
         }
+    }
+
+    private void createText() {
+        mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+        scoreText = new Label(String.format("Score: %d", currentRoundScore), mySkin, "over");
+        scoreText.setSize(100, 100);
+        scoreText.setPosition(300, 700);
+        stage = new Stage(new ScreenViewport());
+        stage.addActor(scoreText);
+
     }
 
     private void loadImages() {
