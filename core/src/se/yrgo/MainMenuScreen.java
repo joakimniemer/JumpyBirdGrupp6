@@ -3,6 +3,7 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -23,6 +24,7 @@ public class MainMenuScreen implements Screen {
     private Buttons buttonSelected;
     private boolean highScoreShow;
     private Texture diffBackground;
+    private Texture backgroundMenu;
     private Stage stage;
     private Stage stageTwo;
     private String instructionsOne = "Choose difficulty:\n1 for easy\n2 for medium\n3 for hard";
@@ -71,23 +73,23 @@ public class MainMenuScreen implements Screen {
         recEasy = new Rectangle(50, 600, 150, 75);
         recMedium = new Rectangle(50, 525, 100, 100);
         recHard = new Rectangle(50, 450, 100, 100);
-        easy = new Texture("easy.png");
-        easySelected = new Texture("easySelected.png");
-        medium = new Texture("medium.png");
-        mediumSelected = new Texture("mediumSelected.png");
-        hard = new Texture("hard.png");
-        hardSelected = new Texture("hardSelected.png");
+        easy = new Texture("MenuAssets/Easy.png");
+        easySelected = new Texture("MenuAssets/EasyPressed.png");
+        medium = new Texture("MenuAssets/Medium.png");
+        mediumSelected = new Texture("MenuAssets/MediumPressed.png");
+        hard = new Texture("MenuAssets/Hard.png");
+        hardSelected = new Texture("MenuAssets/HardPressed.png");
 
         //Skapa rectanglar och texturerer för menyknapparna
         playRec = new Rectangle(225, 500, 250, 100);
         scoreRec = new Rectangle(225, 325, 250, 100);
         exitRec = new Rectangle(225, 150, 250, 100);
-        playButton = new Texture("play.png");
-        scoreButton = new Texture("play.png");
-        exitButton = new Texture("exit.png");
-        playButtonSelected = new Texture("playSelected.png");
-        scoreButtonSelected = new Texture("play.png");
-        exitButtonSelected = new Texture("play.png");
+        playButton = new Texture("MenuAssets/play.png");
+        playButtonSelected = new Texture("MenuAssets/playSelected.png");
+        scoreButton = new Texture("MenuAssets/Highscore.png");
+        scoreButtonSelected = new Texture("MenuAssets/HighscorePressed.png");
+        exitButton = new Texture("MenuAssets/Exit.png");
+        exitButtonSelected = new Texture("MenuAssets/ExitPressed.png");
 
 
         //Sätter diff:s startvärde till 1 (default blir easy).
@@ -101,9 +103,14 @@ public class MainMenuScreen implements Screen {
         highScoreShow = false;
 
         //ladda highscore diff bakgrund
-        diffBackground = new Texture("difficultysBackground.png");
+        diffBackground = new Texture("MenuAssets/difficultysBackground.png");
+        backgroundMenu = new Texture("MenuAssets/backgroundMenu.png");
 
         createText();
+
+        Music menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
+        menuMusic.setLooping(true);
+        menuMusic.play();
 
     }
 
@@ -119,6 +126,7 @@ public class MainMenuScreen implements Screen {
         blinkingInstructions(delta);
 
         game.batch.begin();
+        game.batch.draw(backgroundMenu,0,0, 700, 800);
         //Väljer svårighetsgrad med 1,2,3
         chooseDifficulty();
         //Skriver ut svårighetsgrader och highlightar vald svårighetsgrad (default easy)
@@ -129,6 +137,7 @@ public class MainMenuScreen implements Screen {
         moveInMenu();
         //Highscore menu
         highScoreMenu(delta);
+
         game.batch.end();
 
 
@@ -231,17 +240,17 @@ public class MainMenuScreen implements Screen {
         if (buttonSelected == Buttons.PLAY) {
             game.batch.draw(playButtonSelected, playRec.x, playRec.y, 250, 100);
             game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(playButton, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(exitButton, exitRec.x, exitRec.y, 250, 100);
         }
         if (buttonSelected == Buttons.SCORE) {
             game.batch.draw(playButton, playRec.x, playRec.y, 250, 100);
-            game.batch.draw(playButtonSelected, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(playButton, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(scoreButtonSelected, scoreRec.x, scoreRec.y, 250, 100);
+            game.batch.draw(exitButton, exitRec.x, exitRec.y, 250, 100);
         }
         if (buttonSelected == Buttons.EXIT) {
             game.batch.draw(playButton, playRec.x, playRec.y, 250, 100);
             game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(playButtonSelected, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(exitButtonSelected, exitRec.x, exitRec.y, 250, 100);
         }
 
         buttonEvents();
