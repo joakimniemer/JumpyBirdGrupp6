@@ -6,8 +6,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -86,7 +84,7 @@ public class MainMenuScreen implements Screen {
         exitRec = new Rectangle(225, 150, 250, 100);
         playButton = new Texture("MenuAssets/play.png");
         playButtonSelected = new Texture("MenuAssets/playSelected.png");
-        scoreButton = new Texture("MenuAssets/Highscore.png");
+        scoreButton = new Texture("MenuAssets/HighScore.png");
         scoreButtonSelected = new Texture("MenuAssets/HighscorePressed.png");
         exitButton = new Texture("MenuAssets/Exit.png");
         exitButtonSelected = new Texture("MenuAssets/ExitPressed.png");
@@ -122,22 +120,15 @@ public class MainMenuScreen implements Screen {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
-        //skriva text med Stage, Label och Skin (med en timer som blinkar)
-        blinkingInstructions(delta);
 
         game.batch.begin();
         game.batch.draw(backgroundMenu,0,0, 700, 800);
-        //Väljer svårighetsgrad med 1,2,3
         chooseDifficulty();
-        //Skriver ut svårighetsgrader och highlightar vald svårighetsgrad (default easy)
         difficulty();
-        //Skriver ut menuknappar och highligthar vald knapp (börjar på play)
         menuButtons();
-        //Bläddra i menyn med piltangenterna
         moveInMenu();
-        //Highscore menu
+        drawInstructions(delta);
         highScoreMenu(delta);
-
         game.batch.end();
 
 
@@ -169,10 +160,8 @@ public class MainMenuScreen implements Screen {
         exitHighscoreInstructions.setPosition(250, 230);
 
         stage = new Stage(new ScreenViewport());
-//        Gdx.input.setInputProcessor(stage); Behövs inte? Vad gör den?
         stage.addActor(labelOne);
         stage.addActor(labelTwo);
-
 
         stageTwo = new Stage(new ScreenViewport());
         stageTwo.addActor(highscoreBackground);
@@ -184,15 +173,9 @@ public class MainMenuScreen implements Screen {
         instructionsShowTimer = 0;
     }
 
-    private void blinkingInstructions(float delta) {
-        instructionsShowTimer += delta;
-        if (instructionsShowTimer < 1.3) {
+    private void drawInstructions(float delta) {
             stage.act(delta);
             stage.draw();
-        }
-        if (instructionsShowTimer > 2.6) {
-            instructionsShowTimer = 0;
-        }
     }
 
     private void highScoreMenu(float delta) {
