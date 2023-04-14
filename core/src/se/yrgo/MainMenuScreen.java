@@ -21,7 +21,6 @@ public class MainMenuScreen implements Screen {
 
     private Buttons buttonSelected;
     private boolean highScoreShow;
-    private Texture diffBackground;
     private Texture backgroundMenu;
     private Stage stage;
     private Stage stageTwo;
@@ -65,9 +64,9 @@ public class MainMenuScreen implements Screen {
         camera.setToOrtho(false, 700, 800);
 
         //Skapa rectanglar och texturerer för svårighetsgrad
-        recEasy = new Rectangle(50, 600, 150, 75);
-        recMedium = new Rectangle(50, 525, 100, 100);
-        recHard = new Rectangle(50, 450, 100, 100);
+        recEasy = new Rectangle(50, 600, 150, 100);
+        recMedium = new Rectangle(40, 518, 150, 100);
+        recHard = new Rectangle(40, 450, 150, 100);
         easy = new Texture("MenuAssets/Easy.png");
         easySelected = new Texture("MenuAssets/EasyPressed.png");
         medium = new Texture("MenuAssets/Medium.png");
@@ -77,8 +76,8 @@ public class MainMenuScreen implements Screen {
 
         //Skapa rectanglar och texturerer för menyknapparna
         playRec = new Rectangle(225, 500, 250, 100);
-        scoreRec = new Rectangle(225, 325, 250, 100);
-        exitRec = new Rectangle(225, 150, 250, 100);
+        scoreRec = new Rectangle(220, 325, 250, 100);
+        exitRec = new Rectangle(220, 165, 250, 100);
         playButton = new Texture("MenuAssets/play.png");
         playButtonSelected = new Texture("MenuAssets/playSelected.png");
         scoreButton = new Texture("MenuAssets/HighScore.png");
@@ -95,7 +94,6 @@ public class MainMenuScreen implements Screen {
         highScoreShow = false;
 
         //ladda highscore diff bakgrund
-        diffBackground = new Texture("MenuAssets/difficultysBackground.png");
         backgroundMenu = new Texture("MenuAssets/backgroundMenu.png");
 
         createText();
@@ -116,12 +114,12 @@ public class MainMenuScreen implements Screen {
         game.batch.begin();
         game.batch.draw(backgroundMenu, 0, 0, 700, 800);
         chooseDifficulty();
-        difficulty();
         menuButtons();
         moveInMenu();
         drawInstructions(delta);
-        highScoreMenu(delta);
+        difficulty();
         game.batch.end();
+        highScoreMenu(delta);
     }
 
     private void createText() {
@@ -148,9 +146,22 @@ public class MainMenuScreen implements Screen {
         exitHighscoreInstructions.setSize(100, 100);
         exitHighscoreInstructions.setPosition(250, 230);
 
+        List diffBackground = new List(mySkin);
+        TextField toplineDiffBackground = new TextField("", mySkin);
+        TextField diffPlayConnectionLine = new TextField("", mySkin);
+        diffBackground.setSize(200, 250);
+        diffBackground.setPosition(28, 440);
+        toplineDiffBackground.setSize(185, 20);
+        toplineDiffBackground.setPosition(35, 685);
+        diffPlayConnectionLine.setSize(20, 20);
+        diffPlayConnectionLine.setPosition(215, 545);
+
         stage = new Stage(new ScreenViewport());
         stage.addActor(labelOne);
         stage.addActor(labelTwo);
+        stage.addActor(diffBackground);
+        stage.addActor(toplineDiffBackground);
+        stage.addActor(diffPlayConnectionLine);
 
         stageTwo = new Stage(new ScreenViewport());
         stageTwo.addActor(highscoreBackground);
@@ -186,40 +197,37 @@ public class MainMenuScreen implements Screen {
 
     private void difficulty() {
         if (difficulty == 1) {
-            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easySelected, recEasy.x, recEasy.y, 150, 75);
-            game.batch.draw(medium, recMedium.x, recMedium.y, 150, 75);
-            game.batch.draw(hard, recHard.x, recHard.y, 150, 75);
+            game.batch.draw(medium, recMedium.x, recMedium.y, 170, 95);
+            game.batch.draw(hard, recHard.x, recHard.y, 170, 95);
         }
         if (difficulty == 2) {
-            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easy, recEasy.x, recEasy.y, 150, 75);
-            game.batch.draw(mediumSelected, recMedium.x, recMedium.y, 150, 75);
-            game.batch.draw(hard, recHard.x, recHard.y, 150, 75);
+            game.batch.draw(mediumSelected, recMedium.x, recMedium.y, 170, 95);
+            game.batch.draw(hard, recHard.x, recHard.y, 170, 95);
         }
         if (difficulty == 3) {
-            game.batch.draw(diffBackground, 5, 320, 330, 450);
             game.batch.draw(easy, recEasy.x, recEasy.y, 150, 75);
-            game.batch.draw(medium, recMedium.x, recMedium.y, 150, 75);
-            game.batch.draw(hardSelected, recHard.x, recHard.y, 150, 75);
+            game.batch.draw(medium, recMedium.x, recMedium.y, 170, 95);
+            game.batch.draw(hardSelected, recHard.x, recHard.y, 170, 95);
         }
     }
 
     private void menuButtons() {
         if (buttonSelected == Buttons.PLAY) {
             game.batch.draw(playButtonSelected, playRec.x, playRec.y, 250, 100);
-            game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(exitButton, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 260, 120);
+            game.batch.draw(exitButton, exitRec.x, exitRec.y, 260, 120);
         }
         if (buttonSelected == Buttons.SCORE) {
             game.batch.draw(playButton, playRec.x, playRec.y, 250, 100);
-            game.batch.draw(scoreButtonSelected, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(exitButton, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(scoreButtonSelected, scoreRec.x, scoreRec.y, 260, 110);
+            game.batch.draw(exitButton, exitRec.x, exitRec.y, 260, 120);
         }
         if (buttonSelected == Buttons.EXIT) {
             game.batch.draw(playButton, playRec.x, playRec.y, 250, 100);
-            game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 250, 100);
-            game.batch.draw(exitButtonSelected, exitRec.x, exitRec.y, 250, 100);
+            game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 260, 120);
+            game.batch.draw(exitButtonSelected, exitRec.x, exitRec.y, 260, 110);
         }
         buttonEvents();
     }
@@ -295,7 +303,6 @@ public class MainMenuScreen implements Screen {
         scoreButtonSelected.dispose();
         exitButton.dispose();
         exitButtonSelected.dispose();
-        diffBackground.dispose();
         backgroundMenu.dispose();
         menuMusic.dispose();
     }
