@@ -3,13 +3,14 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.Scanner;
@@ -26,7 +27,7 @@ public class GameOverScreen implements Screen {
     private long currentTime;
     private long delayTimer;
     private int difficulty;
-    private String text = "You died!\nYou got %d score.\nAll time highscore is: %d.\nPress space to restard,\n'ESC' to get back to main menu.";
+    private String text = "              You died!\n          You got %d score\n    All time highscore is: %d\n'ESC' to get back to main menu\n       'Space' to play again";
     private Stage stage;
 
     public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
@@ -41,26 +42,25 @@ public class GameOverScreen implements Screen {
         camera.setToOrtho(false, 700, 800);
         highScore = LoadAssets.getHighScore();
 
-        createText();
+        createTextAndHighscoreBox();
     }
 
 
 
     @Override
     public void render(float delta) {
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "You Died!", 175, 400);
-        game.font.draw(game.batch, String.format("You got %d score!", currentRoundScore), 175, 350);
-        game.font.draw(game.batch, String.format("All time highscore is: %d", highScore), 175, 300);
-        game.font.draw(game.batch, "Press space to restart! (2sec freeze delay)", 175, 250);
-        game.font.draw(game.batch, "Or press 'ESC' to get back to the main menu", 175, 200);
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen((new MainMenuScreen(game)));
         }
         game.batch.end();
+
+        stage.act(delta);
+        stage.draw();
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer()) {
             game.setScreen(new JumpyBirbScreen(game, difficulty));
@@ -73,14 +73,28 @@ public class GameOverScreen implements Screen {
         return (currentTime > enteringScreenTimer + delayTimer);
     }
 
-    private void createText() {
+    private void createTextAndHighscoreBox() {
         Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
         Label labelOne = new Label(String.format(text,currentRoundScore,highScore), mySkin, "over");
         labelOne.setSize(100, 100);
-        labelOne.setPosition(30, 700);
+        labelOne.setPosition(200, 600);
+
+        Label highScoreText = new Label(String.format("All time highscore: %d", LoadAssets.getHighScore()), mySkin, "over");
+        highScoreText.setSize(100, 100);
+        highScoreText.setPosition(240, 450);
+
+        List highscoreBackground = new List(mySkin);
+        TextField toplineHighscoreBackground = new TextField("", mySkin);
+        highscoreBackground.setSize(400, 400);
+        highscoreBackground.setPosition(150, 150);
+        toplineHighscoreBackground.setSize(385, 20);
+        toplineHighscoreBackground.setPosition(158, 545);
 
         stage = new Stage(new ScreenViewport());
         stage.addActor(labelOne);
+        stage.addActor(highscoreBackground);
+        stage.addActor(highScoreText);
+        stage.addActor(toplineHighscoreBackground);
     }
 
     @Override
