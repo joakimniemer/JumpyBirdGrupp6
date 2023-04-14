@@ -287,7 +287,7 @@ public class JumpyBirbScreen implements Screen {
 
     private void loadImages() {
         spaceship = new Texture("spaceship.png");
-        astroid = new Texture("astroid.png");
+        astroid = new Texture("asteroid.png");
     }
 
     @Override
