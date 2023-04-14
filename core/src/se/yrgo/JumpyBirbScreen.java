@@ -64,10 +64,11 @@ public class JumpyBirbScreen implements Screen {
 
 
     //bakgrundsbild variabler
-    private float[] backGroundOffset = {0, 0, 0, 0};
+    private int backGroundOffset;
     private float backGroundMaxSrollingSpeed;
     private final int WORLD_HEIGHT = 800;
     private final int WORLD_WIDTH = 700;
+    private Texture backGround1;
 
     //Svårighetsgrad
     private int difficulty;
@@ -91,13 +92,17 @@ public class JumpyBirbScreen implements Screen {
         flamesAnimation();
         createText();
 
-        backGround = new Texture[4];
+        backGround1 = new Texture("MenuAssets/backgroundMenu.png");
+        backGroundOffset = 0;
+
+
+ /*       backGround = new Texture[4];
         backGround[0] = new Texture("bg1.png");
         backGround[1] = new Texture("bg2.png");
         backGround[2] = new Texture("bg3.png");
         backGround[3] = new Texture("bg4.png");
 
-        backGroundMaxSrollingSpeed = (float) (WORLD_WIDTH) / 70;
+        backGroundMaxSrollingSpeed = (float) (WORLD_WIDTH) / 70;*/
 
         batch = new SpriteBatch();
         lastObstacleTime = TimeUtils.nanoTime();
@@ -125,7 +130,13 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
         batch.begin();
-        renderBackground(elapsedTime);
+        backGroundOffset ++;
+        if (backGroundOffset % WORLD_HEIGHT == 0) {
+            backGroundOffset = 0;
+        }
+       /* renderBackground(elapsedTime);*/
+        batch.draw(backGround1, backGroundOffset, WORLD_HEIGHT, WORLD_WIDTH, 0);
+        /*batch.draw(backGround1,0,-backGroundOffset+WORLD_HEIGHT,WORLD_WIDTH, WORLD_HEIGHT);*/
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             setJumpTimer();
@@ -161,7 +172,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     //Array av olika bakgrundsbilder
-    private void renderBackground(float elapsedTime) {
+/*    private void renderBackground(float elapsedTime) {
         backGroundOffset[0] += elapsedTime * backGroundMaxSrollingSpeed / 30;
         backGroundOffset[1] += elapsedTime * backGroundMaxSrollingSpeed / 50;
         backGroundOffset[2] += elapsedTime * backGroundMaxSrollingSpeed / 30;
@@ -175,7 +186,7 @@ public class JumpyBirbScreen implements Screen {
             batch.draw(backGround[layer], -backGroundOffset[layer], 0);
             batch.draw(backGround[layer], -backGroundOffset[layer] + WORLD_HEIGHT, WORLD_WIDTH, WORLD_HEIGHT, 0);
         }
-    }
+    }*/
 
     private void scoreCounter() {
         currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
