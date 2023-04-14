@@ -3,6 +3,7 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -36,7 +37,7 @@ public class JumpyBirbScreen implements Screen {
     private Skin mySkin;
     private Sound jumpSound;
     private Sound crashSound;
-    private Sound gameMusic;
+    private Music gameMusic;
 
     // box2d variabler
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -108,8 +109,7 @@ public class JumpyBirbScreen implements Screen {
         //Load sounds
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/jumpSound.mp3"));
         crashSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/crashSound.wav"));
-        gameMusic = Gdx.audio.newSound(Gdx.files.internal("Sounds/GameMusic.ogg"));
-        gameMusic.setLooping(1231231231,true);
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/GameMusic.ogg"));
         gameMusic.play();
     }
 
@@ -275,7 +275,7 @@ public class JumpyBirbScreen implements Screen {
     private void jumpWithSpaceAndMouseClick(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
-            jumpSound.play();
+            jumpSound.play(0.3f);
         }
     }
 

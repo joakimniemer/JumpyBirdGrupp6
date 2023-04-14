@@ -101,7 +101,6 @@ public class MainMenuScreen implements Screen {
         createText();
 
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
-        menuMusic.setLooping(true);
         menuMusic.play();
 
     }
@@ -229,6 +228,7 @@ public class MainMenuScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && buttonSelected == Buttons.PLAY) {
             dispose();
             game.setScreen(new JumpyBirbScreen(game, difficulty));
+            menuMusic.stop();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && buttonSelected == Buttons.SCORE) {
             highScoreShow = true;
