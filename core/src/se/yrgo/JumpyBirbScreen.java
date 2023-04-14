@@ -3,6 +3,7 @@ package se.yrgo;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.*;
@@ -33,6 +34,8 @@ public class JumpyBirbScreen implements Screen {
     private Stage stage;
     private Label scoreText;
     private Skin mySkin;
+    private Sound jumpSound;
+    private Sound crashSound;
 
     // box2d variabler
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -81,10 +84,9 @@ public class JumpyBirbScreen implements Screen {
 
         //Create boxed with Box2d
         world = new World(new Vector2(0, worldGravity), false);
-        boxDebugger = new Box2DDebugRenderer();
 
         // Box for player
-        player = LoadAssets.createBox(world, SCALE, 32, 16, false, 100, 300);
+        player = LoadAssets.createBox(world, SCALE, 20, 10, false, 100, 300);
 
         loadImages();
         flamesAnimation();
@@ -116,6 +118,9 @@ public class JumpyBirbScreen implements Screen {
         //Skapa text
         createText();
 
+        //Load sounds
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("jumpSound.mp3"));
+        crashSound = Gdx.audio.newSound(Gdx.files.internal("crashSound.wav"));
     }
 
 
@@ -152,9 +157,6 @@ public class JumpyBirbScreen implements Screen {
 
         //Skriv ut text för score
         updateScoreText(delta);
-
-        // Behövs bara för debugging.
-        boxDebugger.render(world, camera.combined);
     }
 
     private void updateScoreText(float delta) {
@@ -198,9 +200,11 @@ public class JumpyBirbScreen implements Screen {
     private void checkForCollison() {
         int numberContacts = world.getContactCount();
         if (numberContacts > 0) {
+            crashSound.play();
             conflictWithObstacle();
         }
         if (player.getPosition().y < 0 || player.getPosition().y > 400) {
+            crashSound.play();
             conflictWithEdge();
         }
     }
@@ -287,6 +291,7 @@ public class JumpyBirbScreen implements Screen {
     private void jumpWithSpaceAndMouseClick(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
+            jumpSound.play();
         }
     }
 
