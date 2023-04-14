@@ -28,8 +28,9 @@ public class MainMenuScreen implements Screen {
     private String instructionsOne = "Choose difficulty:\n1 for easy\n2 for medium\n3 for hard";
     private String instructionsTwo = "Move in the menu\nwith up/down\nselect with space";
     private String instructionsThree = "(Exit with backspace)";
-    private float instructionsShowTimer;
 
+    final ScreenHandler game;
+    OrthographicCamera camera;
 
     //Menyknappar
     Texture playButton;
@@ -41,11 +42,6 @@ public class MainMenuScreen implements Screen {
     Rectangle playRec;
     Rectangle exitRec;
     Rectangle scoreRec;
-
-
-    private Body playBox;
-    final ScreenHandler game;
-    OrthographicCamera camera;
 
     //Svårighetsgrad-knappar
     Rectangle recEasy;
@@ -59,13 +55,14 @@ public class MainMenuScreen implements Screen {
     Texture hardSelected;
     int difficulty;
 
+    private Music menuMusic;
+
 
     public MainMenuScreen(final ScreenHandler game) {
         this.game = game;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
-
 
         //Skapa rectanglar och texturerer för svårighetsgrad
         recEasy = new Rectangle(50, 600, 150, 75);
@@ -89,9 +86,6 @@ public class MainMenuScreen implements Screen {
         exitButton = new Texture("MenuAssets/Exit.png");
         exitButtonSelected = new Texture("MenuAssets/ExitPressed.png");
 
-
-        //Sätter diff:s startvärde till 1 (default blir easy).
-        // OBS! Denna måste också skickas med till gameScreenen
         difficulty = 1;
 
         //Sätter "buttonSelected" till play som start
@@ -106,7 +100,7 @@ public class MainMenuScreen implements Screen {
 
         createText();
 
-        Music menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
         menuMusic.setLooping(true);
         menuMusic.play();
 
@@ -120,9 +114,8 @@ public class MainMenuScreen implements Screen {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
-
         game.batch.begin();
-        game.batch.draw(backgroundMenu,0,0, 700, 800);
+        game.batch.draw(backgroundMenu, 0, 0, 700, 800);
         chooseDifficulty();
         difficulty();
         menuButtons();
@@ -130,12 +123,9 @@ public class MainMenuScreen implements Screen {
         drawInstructions(delta);
         highScoreMenu(delta);
         game.batch.end();
-
-
     }
 
     private void createText() {
-        //Skapa font
         Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
         Label labelOne = new Label(instructionsOne, mySkin, "over");
         labelOne.setSize(100, 100);
@@ -169,18 +159,15 @@ public class MainMenuScreen implements Screen {
         stageTwo.addActor(toplineHighscoreBackground);
         stageTwo.addActor(exitHighscoreInstructions);
 
-        //Initiera timer för blinkande text
-        instructionsShowTimer = 0;
     }
 
     private void drawInstructions(float delta) {
-            stage.act(delta);
-            stage.draw();
+        stage.act(delta);
+        stage.draw();
     }
 
     private void highScoreMenu(float delta) {
         if (highScoreShow == true) {
-//            game.batch.draw(highScoreTabBackGround, 100, 100, 500, 600);
             stageTwo.act(delta);
             stageTwo.draw();
         }
@@ -235,7 +222,6 @@ public class MainMenuScreen implements Screen {
             game.batch.draw(scoreButton, scoreRec.x, scoreRec.y, 250, 100);
             game.batch.draw(exitButtonSelected, exitRec.x, exitRec.y, 250, 100);
         }
-
         buttonEvents();
     }
 
@@ -297,5 +283,20 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void dispose() {
+        easy.dispose();
+        easySelected.dispose();
+        medium.dispose();
+        mediumSelected.dispose();
+        hard.dispose();
+        hardSelected.dispose();
+        playButton.dispose();
+        playButtonSelected.dispose();
+        scoreButton.dispose();
+        scoreButtonSelected.dispose();
+        exitButton.dispose();
+        exitButtonSelected.dispose();
+        diffBackground.dispose();
+        backgroundMenu.dispose();
+        menuMusic.dispose();
     }
 }

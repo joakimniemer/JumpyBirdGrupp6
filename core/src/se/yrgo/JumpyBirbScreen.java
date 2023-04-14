@@ -36,6 +36,7 @@ public class JumpyBirbScreen implements Screen {
     private Skin mySkin;
     private Sound jumpSound;
     private Sound crashSound;
+    private Sound gameMusic;
 
     // box2d variabler
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
@@ -44,7 +45,6 @@ public class JumpyBirbScreen implements Screen {
     private final int speedObstacle = -125;
     private final float spawnTimer = 1f;
     private long lastObstacleTime;
-    private Box2DDebugRenderer boxDebugger;
     private World world;
     private Body player;
     private Array<Body> obstacles;
@@ -63,7 +63,6 @@ public class JumpyBirbScreen implements Screen {
 
 
     //bakgrundsbild variabler
-    //Timing
     private float[] backGroundOffset = {0, 0, 0, 0};
     private float backGroundMaxSrollingSpeed;
     private final int WORLD_HEIGHT = 800;
@@ -71,7 +70,6 @@ public class JumpyBirbScreen implements Screen {
 
     //Svårighetsgrad
     private int difficulty;
-
 
     private final ScreenHandler game;
 
@@ -90,6 +88,7 @@ public class JumpyBirbScreen implements Screen {
 
         loadImages();
         flamesAnimation();
+        createText();
 
         backGround = new Texture[4];
         backGround[0] = new Texture("bg1.png");
@@ -99,28 +98,19 @@ public class JumpyBirbScreen implements Screen {
 
         backGroundMaxSrollingSpeed = (float) (WORLD_WIDTH) / 70;
 
-        //Creating SpriteBatch
         batch = new SpriteBatch();
-
-        //Sätter tiden för senaste hinder första gången
         lastObstacleTime = TimeUtils.nanoTime();
-
-        //Skapar Array för obstacles
         obstacles = new Array<Body>();
-
-        // Initierar poängen och starta poängräknaren
         currentRoundScore = 0;
         scoreTimer = System.nanoTime();
-
-        //Sätter svårighetsgrad med int från main-menu
         this.difficulty = difficulty;
 
-        //Skapa text
-        createText();
-
         //Load sounds
-        jumpSound = Gdx.audio.newSound(Gdx.files.internal("jumpSound.mp3"));
-        crashSound = Gdx.audio.newSound(Gdx.files.internal("crashSound.wav"));
+        jumpSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/jumpSound.mp3"));
+        crashSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/crashSound.wav"));
+        gameMusic = Gdx.audio.newSound(Gdx.files.internal("Sounds/GameMusic.ogg"));
+        gameMusic.setLooping(1231231231,true);
+        gameMusic.play();
     }
 
 
@@ -134,11 +124,8 @@ public class JumpyBirbScreen implements Screen {
 
         update(Gdx.graphics.getDeltaTime());
 
-        //Batch, ritar ut spelare, hinder och bakgrund
         batch.begin();
-
         renderBackground(elapsedTime);
-
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             setJumpTimer();
@@ -152,10 +139,7 @@ public class JumpyBirbScreen implements Screen {
         }
         batch.end();
 
-        //räknar och sätter poäng.
         scoreCounter();
-
-        //Skriv ut text för score
         updateScoreText(delta);
     }
 
@@ -322,10 +306,9 @@ public class JumpyBirbScreen implements Screen {
 
     @Override
     public void dispose() {
-        world.dispose();
-        boxDebugger.dispose();
-        batch.dispose();
         animationSheet.dispose();
+        jumpSound.dispose();
+        gameMusic.dispose();
     }
 
 
@@ -353,6 +336,7 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void gameOverMenu() {
+        dispose();
         game.setScreen(new GameOverScreen(game, currentRoundScore, difficulty));
     }
 
