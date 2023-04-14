@@ -5,8 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import java.util.Scanner;
 
@@ -22,6 +26,8 @@ public class GameOverScreen implements Screen {
     private long currentTime;
     private long delayTimer;
     private int difficulty;
+    private String text = "You died!\nYou got %d score.\nAll time highscore is: %d.\nPress space to restard,\n'ESC' to get back to main menu.";
+    private Stage stage;
 
     public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
         this.game = game;
@@ -35,6 +41,7 @@ public class GameOverScreen implements Screen {
         camera.setToOrtho(false, 700, 800);
         highScore = LoadAssets.getHighScore();
 
+        createText();
     }
 
 
@@ -64,6 +71,16 @@ public class GameOverScreen implements Screen {
     private boolean setDelayTimer() {
         currentTime = TimeUtils.nanoTime();
         return (currentTime > enteringScreenTimer + delayTimer);
+    }
+
+    private void createText() {
+        Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
+        Label labelOne = new Label(String.format(text,currentRoundScore,highScore), mySkin, "over");
+        labelOne.setSize(100, 100);
+        labelOne.setPosition(30, 700);
+
+        stage = new Stage(new ScreenViewport());
+        stage.addActor(labelOne);
     }
 
     @Override

@@ -314,15 +314,11 @@ public class JumpyBirbScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        //TODO: fixa resizen
-        camera.setToOrtho(false, Gdx.graphics.getWidth() / SCALE, Gdx.graphics.getHeight() / SCALE);
-//        camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
-
+        camera.setToOrtho(false, 700 / SCALE, 800 / SCALE);
     }
 
     @Override
     public void pause() {
-
     }
 
     @Override
@@ -332,7 +328,6 @@ public class JumpyBirbScreen implements Screen {
 
     @Override
     public void hide() {
-
     }
 
     private void gameOverMenu() {
@@ -342,7 +337,6 @@ public class JumpyBirbScreen implements Screen {
 
     @Override
     public void show() {
-
     }
 }
 
