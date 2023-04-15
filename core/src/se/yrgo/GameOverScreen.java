@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 
@@ -41,9 +42,12 @@ public class GameOverScreen implements Screen {
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
 
-        createTextAndHighscoreBox();
+        try {
+            createTextAndHighscoreBox();
+        } catch (IOException e) {
+            System.err.println("Error when calling createTextAndHighscoreBox: " + e);
+        }
     }
-
 
 
     @Override
@@ -72,15 +76,15 @@ public class GameOverScreen implements Screen {
         return (currentTime > enteringScreenTimer + delayTimer);
     }
 
-    private void createTextAndHighscoreBox() {
+    private void createTextAndHighscoreBox() throws IOException {
         Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
-        Label labelOne = new Label(String.format(text,currentRoundScore,highScore), mySkin, "over");
+        Label labelOne = new Label(String.format(text, currentRoundScore, highScore), mySkin, "over");
         labelOne.setSize(100, 100);
         labelOne.setPosition(200, 600);
 
-        Label highScoreText = new Label(String.format("List of all highScores"), mySkin, "over");
+        Label highScoreText = new Label(String.format("Highscore-list\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
         highScoreText.setSize(100, 100);
-        highScoreText.setPosition(240, 450);
+        highScoreText.setPosition(280, 340);
 
         List highscoreBackground = new List(mySkin);
         TextField toplineHighscoreBackground = new TextField("", mySkin);

@@ -13,6 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.IOException;
+
 public class MainMenuScreen implements Screen {
 
     private enum Buttons {
@@ -96,7 +98,12 @@ public class MainMenuScreen implements Screen {
         //ladda highscore diff bakgrund
         backgroundMenu = new Texture("MenuAssets/backgroundMenu.png");
 
-        createText();
+
+        try {
+            createText();
+        } catch (IOException e) {
+            System.err.println("Exception thrown when createText was called: " + e);
+        }
 
         menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
         menuMusic.play();
@@ -122,7 +129,7 @@ public class MainMenuScreen implements Screen {
         highScoreMenu(delta);
     }
 
-    private void createText() {
+    private void createText() throws IOException {
         Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
         Label labelOne = new Label(instructionsOne, mySkin, "over");
         labelOne.setSize(100, 100);
@@ -132,9 +139,9 @@ public class MainMenuScreen implements Screen {
         labelTwo.setSize(100, 100);
         labelTwo.setPosition(500, 500);
 
-        Label highScoreText = new Label(String.format("List of all highScores"), mySkin, "over");
+        Label highScoreText = new Label(String.format("Highscore-list:\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
         highScoreText.setSize(100, 100);
-        highScoreText.setPosition(240, 550);
+        highScoreText.setPosition(280, 440);
 
         List highscoreBackground = new List(mySkin);
         TextField toplineHighscoreBackground = new TextField("", mySkin);

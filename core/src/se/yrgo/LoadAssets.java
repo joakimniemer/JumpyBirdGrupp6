@@ -74,6 +74,14 @@ public class LoadAssets {
         return listOfhighScores;
     }
 
+    public static String getStringOfHighscores() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (Highscore hs : listOfHighscoreObjects()) {
+            builder.append(hs.getName() + ":" + hs.getScore() + "\n");
+        }
+        return builder.toString();
+    }
+
     private static int getLowestHighScore() throws IOException {
         var lowestHighScore = Collections.min(listOfHighscoreObjects());
         return lowestHighScore.getScore();
