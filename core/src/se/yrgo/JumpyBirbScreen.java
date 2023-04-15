@@ -27,8 +27,6 @@ import java.util.Iterator;
 public class JumpyBirbScreen implements Screen {
 
     private Texture spaceship;
-
-    private Texture[] backGround;
     private Texture astroid;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -43,12 +41,13 @@ public class JumpyBirbScreen implements Screen {
     // TODO: Skala ner allt till 6.0f för bättre hopp. Lås så man inte kan resiza med hjälp av viewport?
     private final float SCALE = 2.0f;
     private final float worldGravity = -300f;
-    private final int speedObstacle = -125;
+    private int speedObstacle = -125;
     private final float spawnTimer = 1f;
     private long lastObstacleTime;
     private World world;
     private Body player;
     private Array<Body> obstacles;
+    private int obstacleSize;
 
     //poängs variabler
     private int currentRoundScore;
@@ -64,8 +63,6 @@ public class JumpyBirbScreen implements Screen {
 
 
     //bakgrundsbild variabler
-    private int backGroundOffset;
-    private float backGroundMaxSrollingSpeed;
     private final int WORLD_HEIGHT = 800;
     private final int WORLD_WIDTH = 700;
     private Texture backGround1;
@@ -92,9 +89,9 @@ public class JumpyBirbScreen implements Screen {
         flamesAnimation();
         createText();
 
+        //Load background
         backGround1 = new Texture("MenuAssets/backgroundMenu.png");
-        backGroundOffset = 0;
-
+        elapsedTime = 0;
 
         batch = new SpriteBatch();
         lastObstacleTime = TimeUtils.nanoTime();
@@ -106,8 +103,10 @@ public class JumpyBirbScreen implements Screen {
         //Load sounds
         jumpSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/jumpSound.mp3"));
         crashSound = Gdx.audio.newSound(Gdx.files.internal("Sounds/crashSound.wav"));
-        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/GameMusic.ogg"));
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
         gameMusic.play();
+
+        setDifficulty(difficulty);
     }
 
 
@@ -122,13 +121,14 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
         batch.begin();
-        backGroundOffset ++;
-        if (backGroundOffset % WORLD_WIDTH == 0) {
-            backGroundOffset = 0;
+        elapsedTime ++;
+        if (elapsedTime % WORLD_WIDTH == 0) {
+            elapsedTime = 0;
         }
+
        /* renderBackground(elapsedTime);*/
-        batch.draw(backGround1, -backGroundOffset, 0);
-        batch.draw(backGround1,-backGroundOffset+WORLD_WIDTH,0);
+        batch.draw(backGround1, -elapsedTime, 0);
+        batch.draw(backGround1,-elapsedTime+WORLD_WIDTH,0);
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             setJumpTimer();
@@ -138,7 +138,7 @@ public class JumpyBirbScreen implements Screen {
         }
 
         for (Body obstacle : obstacles) {
-            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
+            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, obstacleSize, obstacleSize);
         }
         batch.end();
 
@@ -236,7 +236,7 @@ public class JumpyBirbScreen implements Screen {
         int randomPositionY3 = MathUtils.random(280, 379);
         int randomPositionX1 = MathUtils.random(367, 460);
         int randomPositionX2 = MathUtils.random(367, 460);
-        int randomPositionX3 = MathUtils.random(367, 460);
+        int randomPositionX3 = MathUtils.random(400, 500);
         Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX1, randomPositionY1);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
         Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX2, randomPositionY2);
@@ -247,12 +247,23 @@ public class JumpyBirbScreen implements Screen {
         obstacles.add(middleObstacle);
         obstacles.add(upperObstacle);
         lastObstacleTime = TimeUtils.nanoTime();
+    }
 
+    private void setDifficulty(int difficulty) {
+        if (difficulty == 1) {
+        obstacleSize = 40 ;
+        }
+        if (difficulty == 2) {
+        obstacleSize = 50;
+        }
+        if (difficulty == 3) {
+        obstacleSize = 60;
+        }
     }
 
     // Räknar tid mellan hindren och anropar spawnObstacle();
     private void continuouslySpawningObstacles() {
-        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > spawnTimer) {
+        if (TimeUtils.nanoTime() / 1000000000  - lastObstacleTime / 1000000000 > spawnTimer) {
             spawnObstacle();
         }
     }
@@ -261,7 +272,7 @@ public class JumpyBirbScreen implements Screen {
     private void jumpWithSpaceAndMouseClick(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
-            jumpSound.play(0.3f);
+            jumpSound.play(0.2f);
         }
     }
 

@@ -98,7 +98,7 @@ public class MainMenuScreen implements Screen {
 
         createText();
 
-        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/MenuMusic.ogg"));
+        menuMusic = Gdx.audio.newMusic(Gdx.files.internal("Sounds/GameMusic.ogg"));
         menuMusic.play();
 
     }
