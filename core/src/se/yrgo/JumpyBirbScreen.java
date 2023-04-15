@@ -142,7 +142,7 @@ public class JumpyBirbScreen implements Screen {
         }
         batch.end();
 
-        scoreCounter();
+        scoreCounter(difficulty);
         updateScoreText(delta);
     }
 
@@ -163,8 +163,17 @@ public class JumpyBirbScreen implements Screen {
         jumpStartTime = System.nanoTime();
     }
 
-    private void scoreCounter() {
-        currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
+    private void scoreCounter(int difficulty) {
+        if (difficulty == 1) {
+            currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
+        }
+        if (difficulty == 2) {
+            currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 500000000);
+        }
+        if (difficulty == 3) {
+            currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 250000000);
+        }
+
     }
 
     private void checkForCollison() {
