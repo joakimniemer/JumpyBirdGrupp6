@@ -2,12 +2,13 @@ package se.yrgo;
 
 import com.badlogic.gdx.physics.box2d.*;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 public class LoadAssets {
 
@@ -48,35 +49,80 @@ public class LoadAssets {
         return pBody;
     }
 
-    public static int getHighScore() {
-        int highScore = 0;
-        Path path = Path.of("highScore.txt");
 
-        try {
-            String highScoreString = Files.readString(path);
-            highScore = Integer.parseInt(String.valueOf(highScoreString));
-        } catch (IOException e) {
-            System.err.println("Something went wrong with getting the highscore: " + e);
+    private static List<String> readFromHighscoreFile() throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader("highScore.txt"));
+        List<String> highScoreList = new ArrayList<>();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            highScoreList.add(line);
         }
-        return highScore;
+        return highScoreList;
     }
 
-    public static void updateHighScore(int score) {
-        int highScore = getHighScore();
-        if (score > highScore) {
-            writeToHighScore(score);
+
+    private static List<Highscore> listOfHighscoreObjects() throws IOException {
+        List<Highscore> listOfhighScores = new ArrayList<>();
+
+        for (String highscore : readFromHighscoreFile()) {
+            String[] nameAndScore = highscore.split(":");
+            String name = nameAndScore[0];
+            int score = Integer.parseInt(nameAndScore[1]);
+            listOfhighScores.add(new Highscore(name, score));
+        }
+        return listOfhighScores;
+    }
+
+    private static int getLowestHighScore() throws IOException {
+        var lowestHighScore = Collections.min(listOfHighscoreObjects());
+        return lowestHighScore.getScore();
+    }
+
+    private static boolean isNewHighscore(int score) throws IOException {
+        if (score > getLowestHighScore()) {
+            return true;
+        }
+        return false;
+    }
+
+    public static void updateHighScore(int score) throws IOException {
+        if (isNewHighscore(score)) {
+            Scanner scan = new Scanner(System.in);
+            String name = scan.nextLine();
+            Highscore newHighscore = new Highscore(name, score);
+            writeToHighScore(newHighscore);
         }
     }
 
-    private static void writeToHighScore(int score) {
-        Path path = Path.of("highScore.txt");
 
-        String newHighScore = Integer.toString(score);
+    private static void writeToHighScore(Highscore highscore) throws IOException {
+        List<Highscore> highScorelist = updateHighScoreList(highscore);
+
         try {
-            Files.writeString(path, newHighScore, StandardCharsets.UTF_8, StandardOpenOption.WRITE);
+            BufferedWriter writer = new BufferedWriter(new FileWriter("highScore.txt"));
+            StringBuilder builder = new StringBuilder();
+            for (Highscore hs : highScorelist) {
+                builder.append(hs.getName() + ":" + hs.getScore() + "\n");
+            }
+            String newHighScoreString = builder.toString();
+
+            writer.write(newHighScoreString);
+            writer.flush();
+
         } catch (IOException e) {
             System.err.println("Something went wrong with writing to highscore: " + e);
         }
+    }
+
+    private static List<Highscore> updateHighScoreList(Highscore highscore) throws IOException {
+        List<Highscore> highScorelist = listOfHighscoreObjects();
+        highScorelist.add(highscore);
+        highScorelist.sort(Comparator.reverseOrder());
+        if (highScorelist.size() > 10) {
+            highScorelist.remove(highScorelist.size() - 1);
+        }
+        return highScorelist;
     }
 }
 

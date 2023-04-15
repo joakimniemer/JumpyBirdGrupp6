@@ -132,7 +132,7 @@ public class MainMenuScreen implements Screen {
         labelTwo.setSize(100, 100);
         labelTwo.setPosition(500, 500);
 
-        Label highScoreText = new Label(String.format("All time highscore: %d", LoadAssets.getHighScore()), mySkin, "over");
+        Label highScoreText = new Label(String.format("List of all highScores"), mySkin, "over");
         highScoreText.setSize(100, 100);
         highScoreText.setPosition(240, 550);
 

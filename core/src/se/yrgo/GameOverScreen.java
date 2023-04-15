@@ -27,7 +27,7 @@ public class GameOverScreen implements Screen {
     private long currentTime;
     private long delayTimer;
     private int difficulty;
-    private String text = "              You died!\n          You got %d score\n    All time highscore is: %d\n'ESC' to get back to main menu\n       'Space' to play again";
+    private String text = "              You died!\n          You got %d score\n'ESC' to get back to main menu\n       'Space' to play again";
     private Stage stage;
 
     public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
@@ -40,7 +40,6 @@ public class GameOverScreen implements Screen {
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 700, 800);
-        highScore = LoadAssets.getHighScore();
 
         createTextAndHighscoreBox();
     }
@@ -79,7 +78,7 @@ public class GameOverScreen implements Screen {
         labelOne.setSize(100, 100);
         labelOne.setPosition(200, 600);
 
-        Label highScoreText = new Label(String.format("All time highscore: %d", LoadAssets.getHighScore()), mySkin, "over");
+        Label highScoreText = new Label(String.format("List of all highScores"), mySkin, "over");
         highScoreText.setSize(100, 100);
         highScoreText.setPosition(240, 450);
 

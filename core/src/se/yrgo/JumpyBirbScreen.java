@@ -136,9 +136,8 @@ public class JumpyBirbScreen implements Screen {
         if (jumpTrue()) {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 60, 32, 55);
         }
-
         for (Body obstacle : obstacles) {
-            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 40, 42);
+            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, 70, 72);
         }
         batch.end();
 
@@ -180,14 +179,12 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void conflictWithEdge() {
-        LoadAssets.updateHighScore(currentRoundScore);
         gameOverMenu();
     }
 
     private void conflictWithObstacle() {
         Gdx.graphics.setContinuousRendering(false);
         Gdx.graphics.requestRendering();
-        LoadAssets.updateHighScore(currentRoundScore);
         gameOverMenu();
     }
 
