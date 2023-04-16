@@ -1,1 +1,10 @@
-149
+medium:24
+hard:22
+tihi:16
+easy:12
+test:5
+joakim:3
+hahaha:3
+japp:3
+kim:2
+hej:2

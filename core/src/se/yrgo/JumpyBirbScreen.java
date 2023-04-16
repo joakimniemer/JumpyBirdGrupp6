@@ -121,14 +121,14 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
         batch.begin();
-        elapsedTime ++;
+        elapsedTime++;
         if (elapsedTime % WORLD_WIDTH == 0) {
             elapsedTime = 0;
         }
 
-       /* renderBackground(elapsedTime);*/
+        /* renderBackground(elapsedTime);*/
         batch.draw(backGround1, -elapsedTime, 0);
-        batch.draw(backGround1,-elapsedTime+WORLD_WIDTH,0);
+        batch.draw(backGround1, -elapsedTime + WORLD_WIDTH, 0);
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             setJumpTimer();
@@ -136,7 +136,6 @@ public class JumpyBirbScreen implements Screen {
         if (jumpTrue()) {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 60, 32, 55);
         }
-
         for (Body obstacle : obstacles) {
             batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, obstacleSize, obstacleSize);
         }
@@ -189,14 +188,12 @@ public class JumpyBirbScreen implements Screen {
     }
 
     private void conflictWithEdge() {
-        LoadAssets.updateHighScore(currentRoundScore);
         gameOverMenu();
     }
 
     private void conflictWithObstacle() {
         Gdx.graphics.setContinuousRendering(false);
         Gdx.graphics.requestRendering();
-        LoadAssets.updateHighScore(currentRoundScore);
         gameOverMenu();
     }
 
@@ -260,19 +257,19 @@ public class JumpyBirbScreen implements Screen {
 
     private void setDifficulty(int difficulty) {
         if (difficulty == 1) {
-        obstacleSize = 40 ;
+            obstacleSize = 40;
         }
         if (difficulty == 2) {
-        obstacleSize = 50;
+            obstacleSize = 50;
         }
         if (difficulty == 3) {
-        obstacleSize = 60;
+            obstacleSize = 60;
         }
     }
 
     // Räknar tid mellan hindren och anropar spawnObstacle();
     private void continuouslySpawningObstacles() {
-        if (TimeUtils.nanoTime() / 1000000000  - lastObstacleTime / 1000000000 > spawnTimer) {
+        if (TimeUtils.nanoTime() / 1000000000 - lastObstacleTime / 1000000000 > spawnTimer) {
             spawnObstacle();
         }
     }
