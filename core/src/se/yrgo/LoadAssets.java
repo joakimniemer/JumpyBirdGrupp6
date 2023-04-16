@@ -87,17 +87,15 @@ public class LoadAssets {
         return lowestHighScore.getScore();
     }
 
-    private static boolean isNewHighscore(int score) throws IOException {
+    public static boolean isNewHighscore(int score) throws IOException {
         if (score > getLowestHighScore()) {
             return true;
         }
         return false;
     }
 
-    public static void updateHighScore(int score) throws IOException {
+    public static void updateHighScore(String name, int score) throws IOException {
         if (isNewHighscore(score)) {
-            Scanner scan = new Scanner(System.in);
-            String name = scan.nextLine();
             Highscore newHighscore = new Highscore(name, score);
             writeToHighScore(newHighscore);
         }

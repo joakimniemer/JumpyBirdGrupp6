@@ -1,5 +1,6 @@
 package se.yrgo;
 
+import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -21,7 +22,7 @@ public class GameOverScreen implements Screen {
 
     OrthographicCamera camera;
     final ScreenHandler game;
-    private int highScore;
+    private String newHighScoreName = "";
     private int currentRoundScore;
     private Scanner scan;
     private long enteringScreenTimer;
@@ -30,6 +31,9 @@ public class GameOverScreen implements Screen {
     private int difficulty;
     private String text = "              You died!\n          You got %d score\n'ESC' to get back to main menu\n       'Space' to play again";
     private Stage stage;
+    private Stage newHighscoreStage;
+    private TextField inputLine;
+    private boolean showNewHighscoreNameInput;
 
     public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
         this.game = game;
@@ -44,9 +48,11 @@ public class GameOverScreen implements Screen {
 
         try {
             createTextAndHighscoreBox();
-        } catch (IOException e) {
+            showNewHighscoreNameInput = LoadAssets.isNewHighscore(currentRoundScore);
+        } catch (Exception e) {
             System.err.println("Error when calling createTextAndHighscoreBox: " + e);
         }
+
     }
 
 
@@ -56,19 +62,35 @@ public class GameOverScreen implements Screen {
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
+
         game.batch.begin();
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             game.setScreen((new MainMenuScreen(game)));
         }
         game.batch.end();
-
         stage.act(delta);
         stage.draw();
+        try {
+            if (showNewHighscoreNameInput) {
+                askForNameInput();
+                if (!inputLine.getText().equalsIgnoreCase("") && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+                    LoadAssets.updateHighScore(inputLine.getText(), currentRoundScore);
+                    showNewHighscoreNameInput = !showNewHighscoreNameInput;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error when checking if new highscore: " + e);
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer()) {
             game.setScreen(new JumpyBirbScreen(game, difficulty));
             dispose();
         }
+    }
+
+    private void askForNameInput() {
+        newHighscoreStage.draw();
+        newHighscoreStage.act();
     }
 
     private boolean setDelayTimer() {
@@ -78,11 +100,11 @@ public class GameOverScreen implements Screen {
 
     private void createTextAndHighscoreBox() throws IOException {
         Skin mySkin = new Skin(Gdx.files.internal("skin/neon-ui.json"));
-        Label labelOne = new Label(String.format(text, currentRoundScore, highScore), mySkin, "over");
+        Label labelOne = new Label(String.format(text, currentRoundScore), mySkin, "over");
         labelOne.setSize(100, 100);
         labelOne.setPosition(200, 600);
 
-        Label highScoreText = new Label(String.format("Highscore-list\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
+        Label highScoreText = new Label(String.format("Highscore-list:\n\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
         highScoreText.setSize(100, 100);
         highScoreText.setPosition(280, 340);
 
@@ -98,6 +120,25 @@ public class GameOverScreen implements Screen {
         stage.addActor(highscoreBackground);
         stage.addActor(highScoreText);
         stage.addActor(toplineHighscoreBackground);
+
+        newHighscoretext(mySkin);
+    }
+
+    private void newHighscoretext(Skin skin) {
+        newHighscoreStage = new Stage(new ScreenViewport());
+        inputLine = new TextField("", skin);
+        inputLine.setSize(200, 25);
+        inputLine.setPosition(250, 600);
+        Label askForNameInput = new Label("New highscore! Enter name below and press enter", skin, "over");
+        askForNameInput.setPosition(100, 630);
+        List background = new List(skin);
+        background.setSize(600, 60);
+        background.setPosition(50, 590);
+
+        newHighscoreStage.addActor(background);
+        newHighscoreStage.addActor(askForNameInput);
+        newHighscoreStage.addActor(inputLine);
+        Gdx.input.setInputProcessor(newHighscoreStage);
     }
 
     @Override
@@ -133,4 +174,5 @@ public class GameOverScreen implements Screen {
     public void exitGame() {
         Gdx.app.exit();
     }
+
 }
