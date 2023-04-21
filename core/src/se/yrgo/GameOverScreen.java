@@ -64,7 +64,7 @@ public class GameOverScreen implements Screen {
 
 
         game.batch.begin();
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && !showNewHighscoreNameInput) {
             game.setScreen((new MainMenuScreen(game)));
         }
         game.batch.end();
@@ -82,7 +82,7 @@ public class GameOverScreen implements Screen {
             System.err.println("Error when checking if new highscore: " + e);
         }
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer()) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && setDelayTimer() && !showNewHighscoreNameInput || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT) && setDelayTimer() && !showNewHighscoreNameInput) {
             game.setScreen(new JumpyBirbScreen(game, difficulty));
             dispose();
         }
@@ -127,7 +127,7 @@ public class GameOverScreen implements Screen {
     private void newHighscoretext(Skin skin) {
         newHighscoreStage = new Stage(new ScreenViewport());
         inputLine = new TextField("", skin);
-        inputLine.setSize(200, 25);
+        inputLine.setSize(200, 40);
         inputLine.setPosition(250, 600);
         Label askForNameInput = new Label("New highscore! Enter name below and press enter", skin, "over");
         askForNameInput.setPosition(100, 630);
