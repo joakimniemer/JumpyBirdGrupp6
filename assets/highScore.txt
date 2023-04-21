@@ -6,5 +6,5 @@ hard:22
 tihi:16
 easy:12
 asd:10
-1111:8
-1 4:7
+asd:9
+a:9

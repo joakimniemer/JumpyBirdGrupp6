@@ -28,7 +28,7 @@ public class MainMenuScreen implements Screen {
     private Stage stageTwo;
     private String instructionsOne = "Choose difficulty:\n1 for easy\n2 for medium\n3 for hard";
     private String instructionsTwo = "Move in the menu\nwith up/down\nselect with space";
-    private String instructionsThree = "(Exit with backspace)";
+    private String instructionsThree = "   (Exit with esc)";
 
     final ScreenHandler game;
     OrthographicCamera camera;
@@ -251,7 +251,7 @@ public class MainMenuScreen implements Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && buttonSelected == Buttons.EXIT) {
             Gdx.app.exit();
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.BACKSPACE) && highScoreShow == true) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE) && highScoreShow == true) {
             highScoreShow = false;
         }
     }
