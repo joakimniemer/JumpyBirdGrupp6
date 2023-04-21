@@ -1,5 +1,5 @@
 buildscript {
-    
+
 
     repositories {
         mavenLocal()
@@ -9,9 +9,13 @@ buildscript {
         google()
     }
     dependencies {
-        
+
 
     }
+}
+
+plugins {
+    id "org.sonarqube" version "4.0.0.2929"
 }
 
 allprojects {
@@ -48,7 +52,7 @@ project(":desktop") {
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
         api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        
+
     }
 }
 
@@ -61,3 +65,5 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     }
 }
+
+

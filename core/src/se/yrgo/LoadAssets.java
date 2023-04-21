@@ -96,7 +96,17 @@ public class LoadAssets {
 
     public static void updateHighScore(String name, int score) throws IOException {
         if (isNewHighscore(score)) {
-            Highscore newHighscore = new Highscore(name, score);
+
+            char[] chars = name.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (!Character.isAlphabetic(chars[i]) || Character.isWhitespace(chars[i])){
+                    System.out.println("Inte bokstav");
+                    //TODO: Hantera om det inte är bokstäver
+                }
+
+            }
+
+            Highscore newHighscore = new Highscore(name.trim(), score);
             writeToHighScore(newHighscore);
         }
     }
