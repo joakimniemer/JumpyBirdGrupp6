@@ -66,6 +66,7 @@ public class JumpyBirbScreen implements Screen {
     private final int WORLD_HEIGHT = 800;
     private final int WORLD_WIDTH = 700;
     private Texture backGround1;
+    private int backgroundOffset;
 
     //Svårighetsgrad
     private int difficulty;
@@ -91,7 +92,7 @@ public class JumpyBirbScreen implements Screen {
 
         //Load background
         backGround1 = new Texture("MenuAssets/backgroundMenu.png");
-        elapsedTime = 0;
+        backgroundOffset = 0;
 
         batch = new SpriteBatch();
         lastObstacleTime = TimeUtils.nanoTime();
@@ -121,14 +122,14 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
         batch.begin();
-        elapsedTime++;
-        if (elapsedTime % WORLD_WIDTH == 0) {
-            elapsedTime = 0;
+        backgroundOffset++;
+        if (backgroundOffset % WORLD_WIDTH == 0) {
+            backgroundOffset = 0;
         }
 
         /* renderBackground(elapsedTime);*/
-        batch.draw(backGround1, -elapsedTime, 0);
-        batch.draw(backGround1, -elapsedTime + WORLD_WIDTH, 0);
+        batch.draw(backGround1, -backgroundOffset, 0);
+        batch.draw(backGround1, -backgroundOffset + WORLD_WIDTH, 0);
         batch.draw(spaceship, player.getPosition().x - 16, player.getPosition().y - 8, 32, 16);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             setJumpTimer();
