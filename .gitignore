@@ -3,7 +3,6 @@
 *.class
 *.war
 *.ear
-*.txt
 hs_err_pid*
 
 ## Robovm
@@ -113,5 +112,8 @@ Thumbs.db
 /ios/xcode/native/
 /ios/IOSLauncher.app
 /ios/IOSLauncher.app.dSYM
+
+## Other
+highScore.txt
 
 
