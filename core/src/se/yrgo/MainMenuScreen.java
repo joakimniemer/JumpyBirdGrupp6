@@ -13,7 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class MainMenuScreen implements Screen {
 
@@ -97,6 +100,8 @@ public class MainMenuScreen implements Screen {
 
         //ladda highscore diff bakgrund
         backgroundMenu = new Texture("MenuAssets/backgroundMenu.png");
+
+
 
 
         try {

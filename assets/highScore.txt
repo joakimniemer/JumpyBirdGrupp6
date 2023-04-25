@@ -1,10 +1,3 @@
-joakimNiemer:120
-asdasdasdasd:54
-medium:24
-wow:23
-hard:22
-tihi:16
-easy:12
-asd:10
-asd:9
-a:9
+jn:6
+Joakim:4
+jnnn:4

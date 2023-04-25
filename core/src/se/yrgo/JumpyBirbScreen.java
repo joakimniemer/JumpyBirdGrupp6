@@ -166,11 +166,9 @@ public class JumpyBirbScreen implements Screen {
     private void scoreCounter(int difficulty) {
         if (difficulty == 1) {
             currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 1000000000);
-        }
-        if (difficulty == 2) {
+        } else if (difficulty == 2) {
             currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 500000000);
-        }
-        if (difficulty == 3) {
+        } else if (difficulty == 3) {
             currentRoundScore = (int) ((System.nanoTime() - scoreTimer) / 250000000);
         }
 
@@ -259,11 +257,9 @@ public class JumpyBirbScreen implements Screen {
     private void setDifficulty(int difficulty) {
         if (difficulty == 1) {
             obstacleSize = 40;
-        }
-        if (difficulty == 2) {
+        } else if (difficulty == 2) {
             obstacleSize = 50;
-        }
-        if (difficulty == 3) {
+        } else if (difficulty == 3) {
             obstacleSize = 60;
         }
     }

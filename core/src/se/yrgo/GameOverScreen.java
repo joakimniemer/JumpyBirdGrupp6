@@ -34,6 +34,7 @@ public class GameOverScreen implements Screen {
     private Stage newHighscoreStage;
     private TextField inputLine;
     private boolean showNewHighscoreNameInput;
+    private Label highScoreText;
 
     public GameOverScreen(final ScreenHandler game, int score, int difficulty) {
         this.game = game;
@@ -68,13 +69,16 @@ public class GameOverScreen implements Screen {
             game.setScreen((new MainMenuScreen(game)));
         }
         game.batch.end();
+
         stage.act(delta);
         stage.draw();
+        updateHighScoreText();
         try {
             if (showNewHighscoreNameInput) {
                 askForNameInput();
                 if (!inputLine.getText().equalsIgnoreCase("") && Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-                    LoadAssets.updateHighScore(inputLine.getText(), currentRoundScore);
+                    String input = checkLengthOfInput(inputLine.getText());
+                    LoadAssets.updateHighScore(input, currentRoundScore);
                     showNewHighscoreNameInput = !showNewHighscoreNameInput;
                 }
             }
@@ -86,6 +90,22 @@ public class GameOverScreen implements Screen {
             game.setScreen(new JumpyBirbScreen(game, difficulty));
             dispose();
         }
+    }
+
+    private String checkLengthOfInput(String input) {
+        if (input.length() > 15) {
+            return input.substring(0, 15);
+        }
+        return input;
+    }
+
+    private void updateHighScoreText() {
+        try {
+            highScoreText.setText(String.format("Highscore-list:\n\n%s", LoadAssets.getStringOfHighscores()));
+        } catch (IOException e) {
+            System.err.println("Error when updateing highscore text in GameOverScrren " + e);
+        }
+
     }
 
     private void askForNameInput() {
@@ -104,7 +124,7 @@ public class GameOverScreen implements Screen {
         labelOne.setSize(100, 100);
         labelOne.setPosition(200, 600);
 
-        Label highScoreText = new Label(String.format("Highscore-list:\n\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
+        highScoreText = new Label(String.format("Highscore-list:\n\n%s", LoadAssets.getStringOfHighscores()), mySkin, "over");
         highScoreText.setSize(100, 100);
         highScoreText.setPosition(280, 340);
 
@@ -170,9 +190,4 @@ public class GameOverScreen implements Screen {
     public void dispose() {
 
     }
-
-    public void exitGame() {
-        Gdx.app.exit();
-    }
-
 }

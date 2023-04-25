@@ -51,6 +51,9 @@ public class LoadAssets {
 
 
     private static List<String> readFromHighscoreFile() throws IOException {
+        if (!Files.exists(Path.of("highScore.txt"))) {
+            Files.createFile(Path.of("highScore.txt"));
+        }
         BufferedReader reader = new BufferedReader(new FileReader("highScore.txt"));
         List<String> highScoreList = new ArrayList<>();
 
@@ -83,6 +86,9 @@ public class LoadAssets {
     }
 
     private static int getLowestHighScore() throws IOException {
+        if (listOfHighscoreObjects().size() < 10) {
+            return 0;
+        }
         var lowestHighScore = Collections.min(listOfHighscoreObjects());
         return lowestHighScore.getScore();
     }
@@ -99,7 +105,7 @@ public class LoadAssets {
 
             char[] chars = name.toCharArray();
             for (int i = 0; i < chars.length; i++) {
-                if (!Character.isAlphabetic(chars[i]) || Character.isWhitespace(chars[i])){
+                if (!Character.isAlphabetic(chars[i]) || Character.isWhitespace(chars[i])) {
                     System.out.println("Inte bokstav");
                     //TODO: Hantera om det inte är bokstäver
                 }
