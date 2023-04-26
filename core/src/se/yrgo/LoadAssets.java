@@ -102,17 +102,14 @@ public class LoadAssets {
 
     public static void updateHighScore(String name, int score) throws IOException {
         if (isNewHighscore(score)) {
-
+            String finalName = name;
             char[] chars = name.toCharArray();
             for (int i = 0; i < chars.length; i++) {
                 if (!Character.isAlphabetic(chars[i]) || Character.isWhitespace(chars[i])) {
-                    System.out.println("Inte bokstav");
-                    //TODO: Hantera om det inte är bokstäver
+                    finalName = "player";
                 }
-
             }
-
-            Highscore newHighscore = new Highscore(name.trim(), score);
+            Highscore newHighscore = new Highscore(finalName.trim(), score);
             writeToHighScore(newHighscore);
         }
     }

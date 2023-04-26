@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -48,6 +49,7 @@ public class JumpyBirbScreen implements Screen {
     private Body player;
     private Array<Body> obstacles;
     private int obstacleSize;
+    private int obstacleOffset;
 
     //poängs variabler
     private int currentRoundScore;
@@ -67,7 +69,6 @@ public class JumpyBirbScreen implements Screen {
     private final int WORLD_WIDTH = 700;
     private Texture backGround1;
     private int backgroundOffset;
-
 
     //Svårighetsgrad
     private int difficulty;
@@ -125,7 +126,6 @@ public class JumpyBirbScreen implements Screen {
         update(Gdx.graphics.getDeltaTime());
 
 
-
         batch.begin();
         backgroundOffset++;
         if (backgroundOffset % WORLD_WIDTH == 0) {
@@ -143,7 +143,7 @@ public class JumpyBirbScreen implements Screen {
             batch.draw(currentFrame, player.getPosition().x - 16, player.getPosition().y - 60, 32, 55);
         }
         for (Body obstacle : obstacles) {
-            batch.draw(astroid, obstacle.getPosition().x - 20, obstacle.getPosition().y - 20, obstacleSize, obstacleSize);
+            batch.draw(astroid, obstacle.getPosition().x - obstacleOffset, obstacle.getPosition().y - obstacleOffset, obstacleSize, obstacleSize);
         }
         batch.end();
 
@@ -262,10 +262,13 @@ public class JumpyBirbScreen implements Screen {
     private void setDifficulty(int difficulty) {
         if (difficulty == 1) {
             obstacleSize = 40;
+            obstacleOffset = 20;
         } else if (difficulty == 2) {
             obstacleSize = 50;
+            obstacleOffset = 25;
         } else if (difficulty == 3) {
             obstacleSize = 60;
+            obstacleOffset = 30;
         }
     }
 
