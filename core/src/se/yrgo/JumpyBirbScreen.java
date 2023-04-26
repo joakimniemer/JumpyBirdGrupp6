@@ -68,6 +68,7 @@ public class JumpyBirbScreen implements Screen {
     private Texture backGround1;
     private int backgroundOffset;
 
+
     //Svårighetsgrad
     private int difficulty;
 
@@ -108,11 +109,13 @@ public class JumpyBirbScreen implements Screen {
         gameMusic.play();
 
         setDifficulty(difficulty);
+
     }
 
 
     @Override
     public void render(float delta) {
+
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Gdx.graphics.setContinuousRendering(true);
 
@@ -120,6 +123,8 @@ public class JumpyBirbScreen implements Screen {
         TextureRegion currentFrame = fireAnimation.getKeyFrame(elapsedTime, true);
 
         update(Gdx.graphics.getDeltaTime());
+
+
 
         batch.begin();
         backgroundOffset++;
@@ -242,11 +247,11 @@ public class JumpyBirbScreen implements Screen {
         int randomPositionX1 = MathUtils.random(367, 460);
         int randomPositionX2 = MathUtils.random(367, 460);
         int randomPositionX3 = MathUtils.random(400, 500);
-        Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX1, randomPositionY1);
+        Body lowerObstacle = LoadAssets.createKinimaticBody(world, SCALE, obstacleSize, randomPositionX1, randomPositionY1);
         lowerObstacle.setLinearVelocity(speedObstacle, 0);
-        Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX2, randomPositionY2);
+        Body middleObstacle = LoadAssets.createKinimaticBody(world, SCALE, obstacleSize, randomPositionX2, randomPositionY2);
         middleObstacle.setLinearVelocity(speedObstacle, 0);
-        Body upperObstacle = LoadAssets.createKinimaticBody(world, SCALE, 32, randomPositionX3, randomPositionY3);
+        Body upperObstacle = LoadAssets.createKinimaticBody(world, SCALE, obstacleSize, randomPositionX3, randomPositionY3);
         upperObstacle.setLinearVelocity(speedObstacle, 0);
         obstacles.add(lowerObstacle);
         obstacles.add(middleObstacle);
@@ -275,7 +280,7 @@ public class JumpyBirbScreen implements Screen {
     private void jumpWithSpaceAndMouseClick(float delta) {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) || Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             player.applyForceToCenter(0, 100000000, false);
-            jumpSound.play(0.2f);
+            jumpSound.play(0.1f);
         }
     }
 
@@ -309,6 +314,7 @@ public class JumpyBirbScreen implements Screen {
         animationSheet.dispose();
         jumpSound.dispose();
         gameMusic.dispose();
+
     }
 
 
